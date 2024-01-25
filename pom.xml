@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>coffee.mason.blacktar</groupId>
+	<artifactId>BlackTar</artifactId>
+	<version>0.0.1</version>
+	<name>Black Tar Library</name>
+	<description>Black Tar is a library for video game development. Its goal is to provide simple TeaVM classes for 2d and 3d game development.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.teavm</groupId>
+			<artifactId>teavm-classlib</artifactId>
+			<version>0.8.1</version>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<maven.compiler.release>11</maven.compiler.release>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.teavm</groupId>
+				<artifactId>teavm-maven-plugin</artifactId>
+				<version>0.8.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<source>11</source>
+							<target>11</target>
+							<mainClass>coffee.mason.blacktar.compile.Testing</mainClass>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+</project>

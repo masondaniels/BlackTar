@@ -1,0 +1,11 @@
+# Maven target directory
+target/
+
+# Eclipse IDE files and directories
+.metadata/
+.settings/
+.classpath
+.project
+
+# Ignore ZIP files
+*.zip
