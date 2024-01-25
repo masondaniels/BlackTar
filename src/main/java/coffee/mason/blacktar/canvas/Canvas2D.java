@@ -8,7 +8,7 @@ public abstract class Canvas2D extends Canvas {
 
 	public Canvas2D(boolean fullscreen) {
 		super("2d", fullscreen);
-		ctx = (CanvasRenderingContext2D) getCanvas().getContext(getContextType());
+		ctx = (CanvasRenderingContext2D) getContext();
 		loadBeforeAnimation();
 		resizeCanvas(getCanvas());
 		if (fullscreen) {

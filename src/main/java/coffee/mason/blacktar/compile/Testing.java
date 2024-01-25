@@ -5,6 +5,7 @@ import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.html.HTMLDocument;
 
 import coffee.mason.blacktar.canvas.Canvas2D;
+import coffee.mason.blacktar.canvas.CanvasGL;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 
 public class Testing {
@@ -63,7 +64,39 @@ public class Testing {
 				getCtx().fillText("Refresh count / 60: " + getRefreshCount()/60f, 10, 60);
 			}
 		};
-		document.appendChild(c.getCanvas());
+		
+		CanvasGL gl = new CanvasGL(true) {
+			
+			@Override
+			public void update() {
+				// TODO Auto-generated method stub
+				
+				System.out.println(((JSNumber) (getCtx().getDrawingBufferWidth())).floatValue());
+				
+			}
+			
+			@Override
+			public void loadBeforeAnimation() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void loadAfterAnimation() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void draw() {
+				// TODO Auto-generated method stub
+				
+				
+			}
+		};
+		
+		document.getBody().appendChild(c.getCanvas());
+		document.getBody().appendChild(gl.getCanvas());
 	}
 	
 }

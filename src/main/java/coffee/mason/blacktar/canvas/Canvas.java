@@ -1,9 +1,11 @@
 package coffee.mason.blacktar.canvas;
 
+import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 
+import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.util.RandomUtil;
 
 public abstract class Canvas {
@@ -89,6 +91,11 @@ public abstract class Canvas {
 	// Get how many times the canvas has been drawn
 	public int getRefreshCount() {
 		return refreshCount;
+	}
+	
+	// Returns context object
+	public JSObject getContext() {
+		return getCanvas().getContext(getContextType());
 	}
 
 }

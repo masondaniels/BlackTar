@@ -14,7 +14,7 @@ import java.io.Serializable;
  *
  */
 
-interface Any extends JSObject, Serializable {
+public interface Any extends JSObject, Serializable {
 
 	@JSBody(script = "return {};")
     static <T extends Any> T empty() {
