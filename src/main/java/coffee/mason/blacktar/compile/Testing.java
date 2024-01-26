@@ -48,8 +48,8 @@ public class Testing {
 			@Override
 			public void draw() {
 
-				System.out.println(getCtx().getDrawingBufferWidth().floatValue() + " "
-						+ getCtx().getDrawingBufferHeight().floatValue());
+//				System.out.println(gl().getDrawingBufferWidth().floatValue() + " "
+//						+ gl().getDrawingBufferHeight().floatValue());
 
 				GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
 				
