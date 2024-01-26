@@ -37,6 +37,8 @@ public abstract class Canvas {
 		});
 	}
 
+	
+	// Already implemented -- called whenever there is a resize
 	public void resizeCanvas(HTMLCanvasElement canvas) {
 		if (fullscreen) {
 			canvas.setWidth(Window.current().getInnerWidth());
@@ -44,6 +46,7 @@ public abstract class Canvas {
 			setWidth(Window.current().getInnerWidth());
 			setHeight(Window.current().getInnerHeight());
 		}
+		onCanvasResize(); // Calls special methods (in implemented classes) on canvas resize if there are any
 		draw();
 	}
 
@@ -58,6 +61,8 @@ public abstract class Canvas {
 	public abstract void update();
 
 	public abstract void draw();
+	
+	public abstract void onCanvasResize();
 
 	public double getWidth() {
 		return width;
@@ -96,6 +101,19 @@ public abstract class Canvas {
 	// Returns context object
 	public JSObject getContext() {
 		return getCanvas().getContext(getContextType());
+	}
+	
+	// Call to set up canvas logic. Includes fullscreen logic.
+	public void setup() {
+		loadBeforeAnimation();
+		resizeCanvas(getCanvas());
+		if (fullscreen) {
+			Window.current().addEventListener("resize", (e) -> {
+				resizeCanvas(getCanvas());
+			});
+		}
+		requestAnimationFrame();
+		loadAfterAnimation();
 	}
 
 }
