@@ -252,8 +252,38 @@ public class GL {
 	public static final int TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
 	public static final int MAX_CUBE_MAP_TEXTURE_SIZE = 0x851C;
 
-//	TEXTURE0 - 31 	0x84C0 - 0x84DF 	A texture unit.
-	// TODO: Implement TEXTURE0 - TEXTURE31
+	public static final int TEXTURE0 = 0x84C0;
+	public static final int TEXTURE1 = 0x84C1;
+	public static final int TEXTURE2 = 0x84C2;
+	public static final int TEXTURE3 = 0x84C3;
+	public static final int TEXTURE4 = 0x84C4;
+	public static final int TEXTURE5 = 0x84C5;
+	public static final int TEXTURE6 = 0x84C6;
+	public static final int TEXTURE7 = 0x84C7;
+	public static final int TEXTURE8 = 0x84C8;
+	public static final int TEXTURE9 = 0x84C9;
+	public static final int TEXTURE10 = 0x84CA;
+	public static final int TEXTURE11 = 0x84CB;
+	public static final int TEXTURE12 = 0x84CC;
+	public static final int TEXTURE13 = 0x84CD;
+	public static final int TEXTURE14 = 0x84CE;
+	public static final int TEXTURE15 = 0x84CF;
+	public static final int TEXTURE16 = 0x84D0;
+	public static final int TEXTURE17 = 0x84D1;
+	public static final int TEXTURE18 = 0x84D2;
+	public static final int TEXTURE19 = 0x84D3;
+	public static final int TEXTURE20 = 0x84D4;
+	public static final int TEXTURE21 = 0x84D5;
+	public static final int TEXTURE22 = 0x84D6;
+	public static final int TEXTURE23 = 0x84D7;
+	public static final int TEXTURE24 = 0x84D8;
+	public static final int TEXTURE25 = 0x84D9;
+	public static final int TEXTURE26 = 0x84DA;
+	public static final int TEXTURE27 = 0x84DB;
+	public static final int TEXTURE28 = 0x84DC;
+	public static final int TEXTURE29 = 0x84DD;
+	public static final int TEXTURE30 = 0x84DE;
+	public static final int TEXTURE31 = 0x84DF;
 
 	public static final int ACTIVE_TEXTURE = 0x84E0;
 	public static final int REPEAT = 0x2901;

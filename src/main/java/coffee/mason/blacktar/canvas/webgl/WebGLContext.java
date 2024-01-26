@@ -1,12 +1,9 @@
 package coffee.mason.blacktar.canvas.webgl;
 
-import org.teavm.jso.JSBody;
-import org.teavm.jso.JSObject;
 import org.teavm.jso.JSProperty;
 import org.teavm.jso.core.JSNumber;
 
 import coffee.mason.blacktar.javascript.Any;
-import coffee.mason.blacktar.javascript.Float32Array;
 
 // Must be interface to interact with properties
 public interface WebGLContext extends Any {
