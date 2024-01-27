@@ -6,7 +6,8 @@
 	<artifactId>BlackTar</artifactId>
 	<version>0.0.1</version>
 	<name>Black Tar Library</name>
-	<description>Black Tar is a library for video game development. Its goal is to provide simple TeaVM classes for 2d and 3d game development.</description>
+	<description>Black Tar is a library for video game development. Its goal is
+		to provide simple TeaVM classes for 2d and 3d game development.</description>
 
 	<dependencies>
 		<dependency>

@@ -6,6 +6,7 @@ import org.teavm.jso.dom.html.HTMLDocument;
 
 import coffee.mason.blacktar.canvas.Canvas2D;
 import coffee.mason.blacktar.canvas.CanvasGL;
+import coffee.mason.blacktar.canvas.impl.CanvasGLImpl;
 import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.util.JavaScriptUtil;
@@ -20,7 +21,13 @@ public class Testing {
 	}
 
 	public static void main(String[] args) {
-		canvasGlTest();
+//		canvasGlTest();
+		canvasGLImplTest();
+		
+	}
+	
+	private static void canvasGLImplTest() {
+		CanvasGLImpl glImpl = new CanvasGLImpl(true);
 	}
 
 	private static void canvasGlTest() {

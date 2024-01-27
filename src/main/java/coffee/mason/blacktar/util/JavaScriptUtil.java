@@ -12,4 +12,16 @@ public class JavaScriptUtil {
 	
 	@JSBody(params = { "object" }, script = "return eval(object);")	
 	public static native JSObject eval(String object);
+	
+	/**
+	 * Equivalent to !object in javascript.
+	 * 
+	 * Can be used in java as:
+	 * if (!JavaScriptUtil.not(object)) {
+	 * 		System.out.println("Object is null/not");
+	 * }
+	 * 
+	 */
+	@JSBody(params = "object", script = "if (!object) { return false; } return true;")
+	public static native boolean not(JSObject object);
 }

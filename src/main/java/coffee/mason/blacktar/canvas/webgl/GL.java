@@ -1,6 +1,9 @@
 package coffee.mason.blacktar.canvas.webgl;
 
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSObject;
+
+import coffee.mason.blacktar.javascript.Float32Array;
 
 public class GL {
 
@@ -360,16 +363,67 @@ public class GL {
 	@JSBody(params = { "gl", "r", "g", "b", "a" }, script = "gl.clearColor(r, g, b, a);")
 	public static native void clearColor(WebGLContext gl, float r, float g, float b, float a);
 
-//	@JSBody(params = {"gl"}, script = "gl.clearColor(0, 0, 0, 1); gl.clear(16384);")
-//	public static native void test(WebGLContext gl);
-
 	@JSBody(params = { "gl", "value" }, script = "gl.clear(value);")
 	public native static void clear(WebGLContext gl, int value);
 
 	@JSBody(params = { "gl", "x", "y", "width", "height" }, script = "gl.viewport(x, y, width, height);")
 	public native static void viewport(WebGLContext gl, float x, float y, float width, float height);
+	
+    @JSBody(params = {"gl", "value"}, script = "return gl.getParameter(value);")
+	public static native JSObject getParameter(WebGLContext gl, int value);
+    
+    @JSBody(params = {"gl", "value"}, script = "return gl.createShader(value);")
+    public static native JSObject createShader(WebGLContext gl, int value);
+    
+    @JSBody(params = {"gl", "shader", "source"}, script = "gl.shaderSource(shader, source);")
+    public static native void shaderSource(WebGLContext gl, JSObject shader, String shaderSource);
+    
+    @JSBody(params = {"gl", "shader"}, script = "gl.compileShader(shader);")
+    public static native void compileShader(WebGLContext gl, JSObject shader);
+    
+    @JSBody(params = {"gl", "shader", "value"}, script = "return gl.getShaderParameter(shader, value);")
+    public static native JSObject getShaderParameter(WebGLContext gl, JSObject shader, int value);
+    
+    @JSBody(params = {"gl", "program", "value"}, script = "return gl.getProgramParameter(program, value);")
+    public static native JSObject getProgramParameter(WebGLContext gl, JSObject program, int value);
+    
+    @JSBody(params = {"gl", "shader"}, script = "return gl.getShaderInfoLog(shader);")
+    public static native String getShaderInfoLog(WebGLContext gl, JSObject shader);
+    
+    @JSBody(params = {"gl"}, script = "const program = gl.createProgram(); return program;")
+	public static native JSObject createProgram(WebGLContext gl);
 
-//    @JSBody(params = "gl", script = "return gl.getParameter(gl.COLOR_CLEAR_VALUE);")
-//	public static native JSObject getClearColor(WebGLContext gl);
+    @JSBody(params = {"gl", "program", "shader"}, script = "gl.attachShader(program, shader);")
+	public static native void attachShader(WebGLContext gl, JSObject program, JSObject shader);
 
+    @JSBody(params = {"gl", "program"}, script = "gl.linkProgram(program);")
+	public static native void linkProgram(WebGLContext gl, JSObject program);
+
+    @JSBody(params = {"gl"}, script = "return gl.createBuffer();")
+	public static native JSObject createBuffer(WebGLContext gl);
+    
+    @JSBody(params = {"gl", "value", "buffer"}, script = "return gl.bindBuffer(value, buffer);")
+	public static native JSObject bindBuffer(WebGLContext gl, int value, JSObject buffer);
+
+    @JSBody(params = {"gl", "arrayValue", "array", "value"}, script = "gl.bufferData(arrayValue, array, value);")
+	public static native void bufferData(WebGLContext gl, int arrayValue, JSObject array, int value);
+
+    @JSBody(params = {"gl", "program", "attrib"}, script = "return gl.getAttribLocation(program, attrib);")
+	public static native int getAttribLocation(WebGLContext gl, JSObject program, String string);
+    
+    @JSBody(params = {"gl", "index", "size", "type", "normalized", "stride", "offset"}, script = "gl.vertexAttribPointer(index, size, type, normalized, stride, offset);")
+    public static native void vertexAttribPointer(WebGLContext gl, int index, int size, int type, boolean normalized, int stride, int offset);
+
+    @JSBody(params = {"gl", "index"}, script = "gl.enableVertexAttribArray(index);")
+	public static native void enableVertexAttribArray(WebGLContext gl, int index);
+    
+    @JSBody(params = {"gl", "mode", "first", "count"}, script = "gl.drawArrays(mode, first, count);")
+    public static native void drawArrays(WebGLContext gl, int mode, int first, int count);
+    
+    @JSBody(params = {"gl", "program"}, script = "gl.useProgram(program);")
+    public static native void useProgram(WebGLContext gl, JSObject program);
+    
+    @JSBody(params = {"gl", "program"}, script = "gl.validateProgram(program);")
+	public static native void validateProgram(WebGLContext gl, JSObject program);
+    
 }
