@@ -1,6 +1,8 @@
 package coffee.mason.blacktar.canvas.impl;
 
 import org.teavm.jso.JSObject;
+import org.teavm.jso.browser.Window;
+import org.teavm.jso.core.JSNumber;
 
 import coffee.mason.blacktar.canvas.CanvasGL;
 import coffee.mason.blacktar.canvas.webgl.GL;
@@ -103,54 +105,46 @@ public class CanvasGLImpl extends CanvasGL {
 		
 		GL.useProgram(gl(), program);
 		
-
-		
 	}
 
 	@Override
 	public void loadAfterAnimation() {
-		// TODO Auto-generated method stub
-
+		
 	}
+
+	private double dpi = -1;
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		if (dpi == -1) {
+			dpi = ((JSNumber) JavaScriptUtil.eval("window.devicePixelRatio || 1")).doubleValue();
+		}
 
+		if (isFullscreen()) {
+			canvas.setWidth((int) (Window.current().getInnerWidth() * dpi));
+			canvas.setHeight((int) (Window.current().getInnerHeight() * dpi));
+			setWidth(Window.current().getInnerWidth() * dpi);
+			setHeight(Window.current().getInnerHeight() * dpi);
+			canvas.getStyle().setProperty("width", Window.current().getInnerWidth() + "px");
+			canvas.getStyle().setProperty("height", Window.current().getInnerHeight() + "px");
+		}
 	}
-
-	boolean flipped;
-	float c = 0;
 
 	@Override
 	public void draw() {
 		
 		GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
-
 		GL.clearColor(gl(), 0f, 0f, 0f, 1f);
 		GL.clear(gl(), GL.COLOR_BUFFER_BIT);
-		
+
 		GL.drawArrays(gl(), GL.TRIANGLES, 0, 3);
 		
-// 		GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
-
-//		
-//		if (getRefreshCount() % 857 == 0) {
-//			flipped = !flipped;
-//			c = 0;
-//		} else {
-//			c++;
-//		}
-//
-//		float f = flipped ? 0f + (c/857f) : 1f - (c/857f);
-//		GL.clearColor(gl(), f, f, f, 1f);
-//		GL.clear(gl(), GL.COLOR_BUFFER_BIT);
 	}
 
 	@Override
 	public void onCanvasResize() {
-		// TODO Auto-generated method stub
-
+		update();
+		draw();
 	}
 
 }
