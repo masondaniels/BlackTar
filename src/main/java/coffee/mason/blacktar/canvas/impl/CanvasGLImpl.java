@@ -13,20 +13,20 @@ import coffee.mason.blacktar.util.StringUtil;
 public class CanvasGLImpl extends CanvasGL {
 
 	private static final String[] VERTEX = {
-			"precision mediump float;"
-			+ "attribute vec2 vertPosition;"
-			+ "void main()"
-			+ "{"
-			+ "  gl_Position = vec4(vertPosition, 0.0, 1.0);"
-			+ "}"
+			"precision mediump float;",
+			"attribute vec2 vertPosition;",
+			"void main()",
+			"{",
+			"  gl_Position = vec4(vertPosition, 0.0, 1.0);",
+			"}"
 	};
 	
 	private static final String[] FRAG = {
-			"precision mediump float;"
-			+ "void main()"
-			+ "{"
-			+ "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);"
-			+ "}"
+			"precision mediump float;",
+			"void main()",
+			"{",
+			"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);",
+			"}"
 	};
 	
 	
