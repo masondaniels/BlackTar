@@ -3,8 +3,6 @@ package coffee.mason.blacktar.canvas.webgl;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
 
-import coffee.mason.blacktar.javascript.Float32Array;
-
 public class GL {
 
 	/**
@@ -425,5 +423,10 @@ public class GL {
     
     @JSBody(params = {"gl", "program"}, script = "gl.validateProgram(program);")
 	public static native void validateProgram(WebGLContext gl, JSObject program);
+
+    @JSBody(params = {"gl", "program", "identifier"}, script = "return gl.getUniformLocation(program, identifier);")
+	public static native int getUniformLocation(WebGLContext gl, JSObject program, String identifier);
     
+    @JSBody(params = {"gl", "location", "transpose", "value"}, script = "gl.uniformMatrix4fv(location, transpose, value);")
+    public static native void uniformMatrix4fv(WebGLContext gl, int location, boolean transpose, JSObject value);
 }
