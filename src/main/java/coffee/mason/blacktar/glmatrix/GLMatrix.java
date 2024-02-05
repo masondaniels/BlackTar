@@ -15,4 +15,7 @@ public class GLMatrix {
 	@JSBody(params = {"out", "rad", "aspect", "near", "far"}, script = "glMatrix.mat4.perspective(out, rad, aspect, near, far);")
 	public static native void perspective(Float32Array out, float radians, float aspect, float near, float far);
 	
+	@JSBody(params = {"out", "a", "rad", "axisa", "axisb", "axisc"}, script = "glMatrix.mat4.rotate(out, a, rad, [axisa, axisb, axisc]);")
+	public static native void rotate(Float32Array out, Float32Array in, float rad, float axisa, float axisb, float axisc);
+	
 }

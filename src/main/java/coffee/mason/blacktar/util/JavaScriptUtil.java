@@ -2,6 +2,7 @@ package coffee.mason.blacktar.util;
 
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
+import org.teavm.jso.core.JSNumber;
 
 public class JavaScriptUtil {
 	@JSBody(params = { "object" }, script = "console.log(\"Logged object: \" + object); console.log(object);")
@@ -12,6 +13,9 @@ public class JavaScriptUtil {
 	
 	@JSBody(params = { "object" }, script = "return eval(object);")	
 	public static native JSObject eval(String object);
+	
+	@JSBody(script = "return performance.now();")
+	public static native JSNumber getElapsed();
 	
 	/**
 	 * Equivalent to !object in javascript.

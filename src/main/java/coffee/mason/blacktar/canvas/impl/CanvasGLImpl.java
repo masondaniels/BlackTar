@@ -23,7 +23,7 @@ public class CanvasGLImpl extends CanvasGL {
 			"uniform mat4 mWorld;",
 			"void main()",
 			"{",
-				"vertColor = vec3(1, 1, 1);",
+				"vertColor = vec3(vertPosition.x + 0.2, vertPosition.y + 0.1, vertPosition.z + 0.4);",
 				"gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
 			"}"
 	};
@@ -42,12 +42,18 @@ public class CanvasGLImpl extends CanvasGL {
 	}
 
 	private Float32Array proj;
+	private Float32Array world;
+	private Float32Array view;
 	private int projUniformLocation;
+	private int viewUniformLocation;
+	private int worldUniformLocation;
 
 	@Override
 	public void loadBeforeAnimation() {
 
 		proj = (Float32Array) Float32Array.create(16);
+		world = (Float32Array) Float32Array.create(16);
+		view = (Float32Array) Float32Array.create(16);
 		
 		setupShader();
 
@@ -132,22 +138,23 @@ public class CanvasGLImpl extends CanvasGL {
 		GL.useProgram(gl(), program);
 
 		projUniformLocation = GL.getUniformLocation(gl(), program, "mProj");
-		int viewUniformLocation = GL.getUniformLocation(gl(), program, "mView");
-		int worldUniformLocation = GL.getUniformLocation(gl(), program, "mWorld");
-
-		Float32Array world = (Float32Array) Float32Array.create(16);
-		Float32Array view = (Float32Array) Float32Array.create(16);
-
-		GLMatrix.lookAt(view, 0, 0, -5, 0, 0, 0, 0, 1, 0);
+		viewUniformLocation = GL.getUniformLocation(gl(), program, "mView");
+		worldUniformLocation = GL.getUniformLocation(gl(), program, "mWorld");
+		
+		GLMatrix.lookAt(view, 0, 0, -2, 0, 0, 0, 0, 1, 0);
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		GLMatrix.identity(world);
 
 		System.out.println(world.get(0) + " SHOULD BE 1 - IF IT IS GLMATRIX IS WORKING.");
 
+		uniformMatrix4fv();
+
+	}
+
+	private void uniformMatrix4fv() {
 		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj);
 		GL.uniformMatrix4fv(gl(), viewUniformLocation, false, view);
 		GL.uniformMatrix4fv(gl(), worldUniformLocation, false, world);
-
 	}
 
 	@Override
@@ -174,7 +181,7 @@ public class CanvasGLImpl extends CanvasGL {
 		GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
 
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj);
+		uniformMatrix4fv();
 
 		System.out.println("Updated projection matrix: [" + proj.get(0) + ", " + proj.get(1) + ", " + proj.get(2) + ", "
 				+ proj.get(3) + ", " + proj.get(4) + ", " + proj.get(5) + ", " + proj.get(6) + ", " + proj.get(7) + ", "
@@ -190,15 +197,25 @@ public class CanvasGLImpl extends CanvasGL {
 		}
 
 	}
+	
+	private float angle;
 
 	@Override
 	public void draw() {
-
+		
+		angle = ((JavaScriptUtil.getElapsed().floatValue() / 1000f) / (2f * (float) Math.PI)) * 3;
+		System.out.println("ANGLE IS " + angle);
+		Float32Array identity = (Float32Array) Float32ArrayUtil.of(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+		GLMatrix.rotate(world, identity, angle, 2, 0, 1);
+		
+		uniformMatrix4fv();
+		
 		GL.clearColor(gl(), 0f, 0f, 0f, 1f);
 		GL.clear(gl(), GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
 		GL.drawArrays(gl(), GL.TRIANGLES, 0, 3);
-
+		
+		
 	}
 
 	@Override
