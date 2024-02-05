@@ -44,6 +44,9 @@ public class CanvasGLImpl extends CanvasGL {
 	private Float32Array proj;
 	private Float32Array world;
 	private Float32Array view;
+	
+	private Float32Array identity;
+	
 	private int projUniformLocation;
 	private int viewUniformLocation;
 	private int worldUniformLocation;
@@ -54,6 +57,8 @@ public class CanvasGLImpl extends CanvasGL {
 		proj = (Float32Array) Float32Array.create(16);
 		world = (Float32Array) Float32Array.create(16);
 		view = (Float32Array) Float32Array.create(16);
+		
+		identity = (Float32Array) Float32ArrayUtil.of(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 		
 		setupShader();
 
@@ -199,13 +204,13 @@ public class CanvasGLImpl extends CanvasGL {
 	}
 	
 	private float angle;
-
+	
 	@Override
 	public void draw() {
 		
 		angle = ((JavaScriptUtil.getElapsed().floatValue() / 1000f) / (2f * (float) Math.PI)) * 3;
 		System.out.println("ANGLE IS " + angle);
-		Float32Array identity = (Float32Array) Float32ArrayUtil.of(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+		
 		GLMatrix.rotate(world, identity, angle, 2, 0, 1);
 		
 		uniformMatrix4fv();
