@@ -27,7 +27,10 @@ public class Testing {
 	}
 	
 	private static void canvasGLImplTest() {
+		
 		CanvasGLImpl glImpl = new CanvasGLImpl(true);
+		glImpl.setZIndex(1);
+		canvas2dTest();
 	}
 
 	private static void canvasGlTest() {
@@ -101,8 +104,7 @@ public class Testing {
 
 			@Override
 			public void loadBeforeAnimation() {
-				// TODO Auto-generated method stub
-
+				setZIndex(3);
 			}
 
 			@Override
@@ -113,9 +115,11 @@ public class Testing {
 
 			@Override
 			public void draw() {
-				getCtx().setFont("30px Arial");
-				getCtx().fillText("Refresh count: " + getRefreshCount(), 10, 30);
-				getCtx().fillText("Refresh count / 60: " + getRefreshCount() / 60f, 10, 60);
+				getCtx().setFillStyle("white");
+				getCtx().setFont("23px Arial");
+				getCtx().fillText("Spinning Triangle", 10, 25);
+				getCtx().fillText("Refresh count: " + getRefreshCount(), 10, 50);
+				getCtx().fillText("Refresh count / 60: " + getRefreshCount() / 60f, 10, 75);
 			}
 
 			@Override
