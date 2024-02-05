@@ -5,10 +5,6 @@ import org.teavm.jso.typedarrays.Float32Array;
 
 
 public class GLMatrix {
-
-	public static void init() {
-//		JavaScriptUtil.eval("import {mat4, vec3} from 'gl-matrix';");
-	}
 	
 	@JSBody(params = {"out"}, script = "glMatrix.mat4.identity(out);")
 	public static native void identity(Float32Array out);

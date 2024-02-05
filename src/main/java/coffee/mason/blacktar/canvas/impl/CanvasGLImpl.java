@@ -41,9 +41,6 @@ public class CanvasGLImpl extends CanvasGL {
 		super(fullscreen);
 	}
 
-//	private MatProj proj;
-//	private Mat4F world;
-//	private MatView view;
 	private Float32Array proj;
 	private int projUniformLocation;
 
@@ -51,12 +48,7 @@ public class CanvasGLImpl extends CanvasGL {
 	public void loadBeforeAnimation() {
 
 		proj = (Float32Array) Float32Array.create(16);
-//		proj = new MatProj();
-//		world = new Mat4F();
-//		view = new MatView();
-
-		GLMatrix.init();
-
+		
 		setupShader();
 
 	}
@@ -143,13 +135,8 @@ public class CanvasGLImpl extends CanvasGL {
 		int viewUniformLocation = GL.getUniformLocation(gl(), program, "mView");
 		int worldUniformLocation = GL.getUniformLocation(gl(), program, "mWorld");
 
-//		view.lookAt(new Vec3(0, 0, -5), new Vec3(0, 0, 1), new Vec3(0, 1, 0));
 		Float32Array world = (Float32Array) Float32Array.create(16);
 		Float32Array view = (Float32Array) Float32Array.create(16);
-
-//		float[] p = {0f,0f,-5f};
-//		float[] t = {0f,0f,0f};
-//		float[] u = {0f,1f,0f};
 
 		GLMatrix.lookAt(view, 0, 0, -5, 0, 0, 0, 0, 1, 0);
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
@@ -157,7 +144,7 @@ public class CanvasGLImpl extends CanvasGL {
 
 		System.out.println(world.get(0) + " SHOULD BE 1 - IF IT IS GLMATRIX IS WORKING.");
 
-		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj); // .getMatrixAsFloat32Array()
+		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj);
 		GL.uniformMatrix4fv(gl(), viewUniformLocation, false, view);
 		GL.uniformMatrix4fv(gl(), worldUniformLocation, false, world);
 
@@ -186,12 +173,9 @@ public class CanvasGLImpl extends CanvasGL {
 
 		GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
 
-//		proj.setAspectRatio((float)getWidth()/(float)getHeight());
-		// TODO: UPDATE PROJ
-
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj);
-//		System.out.println("Updated projection matrix: " + proj.toString());
+
 		System.out.println("Updated projection matrix: [" + proj.get(0) + ", " + proj.get(1) + ", " + proj.get(2) + ", "
 				+ proj.get(3) + ", " + proj.get(4) + ", " + proj.get(5) + ", " + proj.get(6) + ", " + proj.get(7) + ", "
 				+ proj.get(8) + ", " + proj.get(9) + ", " + proj.get(10) + ", " + proj.get(11) + ", " + proj.get(12)
