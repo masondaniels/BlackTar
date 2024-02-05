@@ -9,3 +9,6 @@ target/
 
 # Ignore ZIP files
 *.zip
+
+# Ignore README.md.backup
+README.md.backup

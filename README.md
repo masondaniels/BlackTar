@@ -12,3 +12,12 @@ Black Tar is a Java TeaVM library with WebGL bindings. Its primary purpose is to
 | The engine should be able to draw modern UI which fits the 3d/2d graphics. |❌| |
 | The engine should have a built in camera for looking at the environment in both 3d/2d. |❌| |
 | The engine should have textures, shadows, etc. Nothing too complex. |❌| |
+
+## Visual
+![](https://i.imgur.com/FzbDDFd.gif)
+
+The engine currently renders a triangle at (0, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0) rotated about the x and z axis by a factor of 2 and 1 respectively.
+
+The camera is at position (0, 0, -2) facing the z axis head on.
+
+The engine can effectively render anything in 3d space now. 
