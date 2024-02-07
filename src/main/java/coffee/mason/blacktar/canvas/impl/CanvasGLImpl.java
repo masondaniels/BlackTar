@@ -3,16 +3,20 @@ package coffee.mason.blacktar.canvas.impl;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSNumber;
+import org.teavm.jso.dom.events.Event;
+import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.typedarrays.Float32Array;
 
 import coffee.mason.blacktar.canvas.CanvasGL;
+import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
+import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.glmatrix.GLMatrix;
 import coffee.mason.blacktar.javascript.Float32ArrayUtil;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
 
-public class CanvasGLImpl extends CanvasGL {
+public class CanvasGLImpl extends CanvasGL implements TouchControls {
 
 	private static final String[] VERTEX = {
 			"precision mediump float;",
@@ -40,7 +44,7 @@ public class CanvasGLImpl extends CanvasGL {
 	public CanvasGLImpl(boolean fullscreen) {
 		super(fullscreen);
 	}
-
+	
 	private Float32Array proj;
 	private Float32Array world;
 	private Float32Array view;
@@ -53,6 +57,8 @@ public class CanvasGLImpl extends CanvasGL {
 
 	@Override
 	public void loadBeforeAnimation() {
+		
+		TouchControls.register(this, this);
 
 		proj = (Float32Array) Float32Array.create(16);
 		world = (Float32Array) Float32Array.create(16);
@@ -65,88 +71,139 @@ public class CanvasGLImpl extends CanvasGL {
 	}
 
 	private void setupShader() {
-		JSObject vertexShader = GL.createShader(gl(), GL.VERTEX_SHADER);
-		JSObject fragShader = GL.createShader(gl(), GL.FRAGMENT_SHADER);
+		
+		JSObject vertexShader = gl.createShader(GL.VERTEX_SHADER);
+		JSObject fragShader = gl.createShader(GL.FRAGMENT_SHADER);
 
-		GL.shaderSource(gl(), vertexShader, StringUtil.join("\n", VERTEX));
-		GL.shaderSource(gl(), fragShader, StringUtil.join("\n", FRAG));
+		gl.shaderSource(vertexShader, StringUtil.join("\n", VERTEX));
+		gl.shaderSource(fragShader, StringUtil.join("\n", FRAG));
 
-		GL.compileShader(gl(), vertexShader);
-		GL.compileShader(gl(), fragShader);
+		gl.compileShader(vertexShader);
+		gl.compileShader(fragShader);
 
 		// Compiling error checks - fragment
-		JSObject compileStatusFrag = GL.getShaderParameter(gl(), fragShader, GL.COMPILE_STATUS);
+		JSObject compileStatusFrag = gl.getShaderParameter(fragShader, GL.COMPILE_STATUS);
 		if (!JavaScriptUtil.not(compileStatusFrag)) {
 			System.err.println("Compiling error with fragment shader.");
-			System.err.println(GL.getShaderInfoLog(gl(), fragShader) + "");
+			System.err.println(gl.getShaderInfoLog(fragShader) + "");
 		}
 
 		// Compiling error checks - vertex
-		JSObject compileStatusVertex = GL.getShaderParameter(gl(), vertexShader, GL.COMPILE_STATUS);
+		JSObject compileStatusVertex = gl.getShaderParameter(vertexShader, GL.COMPILE_STATUS);
 		if (!JavaScriptUtil.not(compileStatusVertex)) {
 			System.err.println("Compiling error with vertex shader.");
-			System.err.println(GL.getShaderInfoLog(gl(), vertexShader) + "");
+			System.err.println(gl.getShaderInfoLog(vertexShader) + "");
 		}
 
 		// Need to create graphics program (graphics pipeline)
-		JSObject program = GL.createProgram(gl());
+		JSObject program = gl.createProgram(gl());
 
-		// Attach shaders to program
-		GL.attachShader(gl(), program, vertexShader);
-		GL.attachShader(gl(), program, fragShader);
+		gl.attachShader(program, vertexShader);
+		gl.attachShader(program, fragShader);
 
 		// Link program
-		GL.linkProgram(gl(), program);
+		gl.linkProgram(program);
 
 		// Validate program (very important, literally spent an hour or two debugging
 		// because I missed this)
-		GL.validateProgram(gl(), program);
+		gl.validateProgram(program);
 
-		JSObject programValidStatus = GL.getProgramParameter(gl(), program, GL.VALIDATE_STATUS);
+		JSObject programValidStatus = gl.getProgramParameter(program, GL.VALIDATE_STATUS);
 		if (!JavaScriptUtil.not(programValidStatus)) {
 			System.err.println("Validate status error with program.");
 		}
 
-		JSObject programLinkStatus = GL.getProgramParameter(gl(), program, GL.LINK_STATUS);
+		JSObject programLinkStatus = gl.getProgramParameter(program, GL.LINK_STATUS);
 		if (!JavaScriptUtil.not(programLinkStatus)) {
 			System.err.println("Link error with program.");
 		}
 
-		Float32Array array = (Float32Array) Float32ArrayUtil.of(0f, 0.5f, 0f,
+		Float32Array array = (Float32Array) Float32ArrayUtil.of(
+				
+				// front face
+				0.5f, 0.5f, 0f,
 				-0.5f, -0.5f, 0f,
-				0.5f, -0.5f, 0f);
+				0.5f, -0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				0.5f, 0.5f, 0f,
+				
+				// back face
+				0.5f, 0.5f, 1f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 1f,
+				-0.5f, 0.5f, 1f,
+				-0.5f, -0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				
+				// bottom face
+				0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 1f,
+				
+				// top face
+				0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				
+				// left face
+				-0.5f, -0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				
+				// right face
+				0.5f, 0.5f, 0f,
+				0.5f, -0.5f, 0f,
+				0.5f, -0.5f, 1f,
+				
+				0.5f, -0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 0f
+				
+				);
 
-		JSObject floatBuffer = GL.createBuffer(gl());
+		JSObject floatBuffer = gl.createBuffer(gl());
 
 		// Set as active buffer.
-		GL.bindBuffer(gl(), GL.ARRAY_BUFFER, floatBuffer);
+		gl.bindBuffer(GL.ARRAY_BUFFER, floatBuffer);
 
 		// Put data in active buffer.
-		GL.bufferData(gl(), GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
+		gl.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
 
-		int attribLocation = GL.getAttribLocation(gl(), program, "vertPosition");
+		int attribLocation = gl.getAttribLocation(program, "vertPosition");
 
 		// Setting up attrib
 		// index, size (# of elements per attrib), type, normalized, stride, offset
-		GL.vertexAttribPointer(gl(), attribLocation, 3, GL.FLOAT, false, 3 * 4, 0);
-		GL.enableVertexAttribArray(gl(), attribLocation);
+		gl.vertexAttribPointer(attribLocation, 3, GL.FLOAT, false, 3 * 4, 0);
+		gl.enableVertexAttribArray(attribLocation);
 
-		JSObject colorBuffer = GL.createBuffer(gl());
+		JSObject colorBuffer = gl.createBuffer(gl());
 
-		GL.bindBuffer(gl(), GL.ARRAY_BUFFER, colorBuffer);
+		gl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer);
 
-		int colorLocation = 1; // GL.getAttribLocation(gl(), program, "vertColor");
+		int colorLocation = 1; // GL.getAttribLocation(program, "vertColor");
 
-		GL.vertexAttribPointer(gl(), colorLocation, 3, GL.FLOAT, false, 3 * 4, 3 * 4);
-		GL.enableVertexAttribArray(gl(), colorLocation);
+		gl.vertexAttribPointer(colorLocation, 3, GL.FLOAT, false, 3 * 4, 3 * 4);
+		gl.enableVertexAttribArray(colorLocation);
 
-		GL.useProgram(gl(), program);
-
-		projUniformLocation = GL.getUniformLocation(gl(), program, "mProj");
-		viewUniformLocation = GL.getUniformLocation(gl(), program, "mView");
-		worldUniformLocation = GL.getUniformLocation(gl(), program, "mWorld");
+		gl.useProgram(program);
 		
-		GLMatrix.lookAt(view, 0, 0, -2, 0, 0, 0, 0, 1, 0);
+		// Enable depth testing & culling
+		gl.frontFace(GL.CCW);
+		gl.cullFace(GL.BACK);
+		gl().enable(GL.DEPTH_TEST);
+		
+		projUniformLocation = gl.getUniformLocation(program, "mProj");
+		viewUniformLocation = gl.getUniformLocation(program, "mView");
+		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
+		
+		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		GLMatrix.identity(world);
 
@@ -157,9 +214,9 @@ public class CanvasGLImpl extends CanvasGL {
 	}
 
 	private void uniformMatrix4fv() {
-		GL.uniformMatrix4fv(gl(), projUniformLocation, false, proj);
-		GL.uniformMatrix4fv(gl(), viewUniformLocation, false, view);
-		GL.uniformMatrix4fv(gl(), worldUniformLocation, false, world);
+		gl.uniformMatrix4fv(projUniformLocation, false, proj);
+		gl.uniformMatrix4fv(viewUniformLocation, false, view);
+		gl.uniformMatrix4fv(worldUniformLocation, false, world);
 	}
 
 	@Override
@@ -183,7 +240,7 @@ public class CanvasGLImpl extends CanvasGL {
 			canvas.getStyle().setProperty("height", Window.current().getInnerHeight() + "px");
 		}
 
-		GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
+		gl.viewport(0, 0, (float) getWidth(), (float) getHeight());
 
 		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		uniformMatrix4fv();
@@ -204,28 +261,72 @@ public class CanvasGLImpl extends CanvasGL {
 	}
 	
 	private float angle;
+	private boolean spinPaused;
+	private float pausedLast;
+	private float pausedTime;
 	
 	@Override
 	public void draw() {
+		float t = JavaScriptUtil.getElapsed().floatValue() / 1000f;
+		if (!spinPaused) {
+			if (pausedLast != 0) {
+				pausedTime += (t-pausedLast);
+				pausedLast = 0;
+			}
+			
+			angle = (float) ((float) Math.cos(((t-pausedTime) / (2f * (float) Math.PI)) * 3)*Math.PI * 2f);
 		
-		angle = ((JavaScriptUtil.getElapsed().floatValue() / 1000f) / (2f * (float) Math.PI)) * 3;
-		System.out.println("ANGLE IS " + angle);
+			GLMatrix.rotate(world, identity, angle, 3, 2, 1);
+			gl.uniformMatrix4fv(worldUniformLocation, false, world);
+			
+		} else {
+			
+			if (pausedLast == 0) {
+				pausedLast = t;
+			}
+		}
 		
-		GLMatrix.rotate(world, identity, angle, 2, 0, 1);
-		
-		uniformMatrix4fv();
-		
-		GL.clearColor(gl(), 0f, 0f, 0f, 1f);
-		GL.clear(gl(), GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+		gl.clearColor(0f, 0f, 0f, 1f);
+		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-		GL.drawArrays(gl(), GL.TRIANGLES, 0, 3);
-		
+		gl.drawArrays(GL.TRIANGLES, 0, 18+6+3+6);
+//		gl.drawArrays(GL.TRIANGLES, 0, 18);
 		
 	}
 
 	@Override
 	public void onCanvasResize() {
 		onResize();
+	}
+	
+	private boolean isTouched; // is screen touched?
+
+	@Override
+	public void handleTouchStart(Event e) {
+		System.out.println("Touch start");
+		isTouched = true;
+	}
+
+	@Override
+	public void handleTouchMove(MouseEvent e) {
+		if (isTouched) {
+			System.out.println("Touch move " + e.getClientX() + ", " + e.getClientY());
+			
+		}
+	}
+
+	@Override
+	public void handleTouchEnd(Event e) {
+		isTouched = false;
+		spinPaused = !spinPaused;
+		System.out.println("Touch end");
+	}
+
+	@Override
+	public void handleTouchCancel(Event e) {
+		isTouched = false;
+		System.out.println("Touch cancel");
+		
 	}
 
 }

@@ -23,61 +23,14 @@ public class Testing {
 	public static void main(String[] args) {
 //		canvasGlTest();
 		canvasGLImplTest();
-		
+
 	}
-	
+
 	private static void canvasGLImplTest() {
-		
+
 		CanvasGLImpl glImpl = new CanvasGLImpl(true);
 		glImpl.setZIndex(1);
-		canvas2dTest();
-	}
 
-	private static void canvasGlTest() {
-		CanvasGL gl = new CanvasGL(true) {
-
-			@Override
-			public void update() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void loadBeforeAnimation() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void loadAfterAnimation() {
-				// TODO Auto-generated method stub
-
-			}
-
-			boolean flipped;
-			@Override
-			public void draw() {
-
-//				System.out.println(gl().getDrawingBufferWidth().floatValue() + " "
-//						+ gl().getDrawingBufferHeight().floatValue());
-
-				GL.viewport(gl(), 0, 0, (float) getWidth(), (float) getHeight());
-				
-				if (getRefreshCount() % 60 == 0) {
-					flipped = !flipped;
-				}
-				float f = flipped ? 0f : 1f;
-				GL.clearColor(gl(), f, f, f, 1f);
-				GL.clear(gl(), GL.COLOR_BUFFER_BIT);
-				
-			}
-
-			@Override
-			public void onCanvasResize() {
-				// TODO Auto-generated method stub
-
-			}
-		};
 	}
 
 	private static void canvas2dTest() {
@@ -117,9 +70,10 @@ public class Testing {
 			public void draw() {
 				getCtx().setFillStyle("white");
 				getCtx().setFont("23px Arial");
-				getCtx().fillText("Spinning Triangle", 10, 25);
-				getCtx().fillText("Refresh count: " + getRefreshCount(), 10, 50);
-				getCtx().fillText("Refresh count / 60: " + getRefreshCount() / 60f, 10, 75);
+				getCtx().fillText("Spinning Triangle", 10, 30);
+				getCtx().fillText("Refresh count: " + getRefreshCount(), 10, 55);
+				getCtx().fillText("Refresh count / 60: " + getRefreshCount() / 60f, 10, 80);
+				getCtx().fillText("Elapsed time: " + (JavaScriptUtil.getElapsed().floatValue() / 1000f), 10, 105);
 			}
 
 			@Override
