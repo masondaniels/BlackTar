@@ -14,7 +14,7 @@ Black Tar is a Java TeaVM library with WebGL bindings. Its primary purpose is to
 | The engine should have textures, shadows, etc. Nothing too complex. |❌| |
 
 ## Visual
-https://catbox.moe/sly62s.webm
+https://files.catbox.moe/sly62s.webm
 
 Rotating cube.
 
