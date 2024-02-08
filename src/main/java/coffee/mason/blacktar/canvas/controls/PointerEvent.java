@@ -11,4 +11,7 @@ public interface PointerEvent extends Event {
 	@JSProperty
 	public float getWidth();
 	
+	@JSProperty
+	public float getPressure();
+	
 }

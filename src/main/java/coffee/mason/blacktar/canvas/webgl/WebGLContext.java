@@ -29,13 +29,13 @@ public interface WebGLContext extends Any {
 
 	String getShaderInfoLog(JSObject shader);
 
-	JSObject createProgram(WebGLContext gl);
+	JSObject createProgram();
 
 	void attachShader(JSObject program, JSObject shader);
 
 	void linkProgram(JSObject program);
 
-	JSObject createBuffer(WebGLContext gl);
+	JSObject createBuffer();
 
 	JSObject bindBuffer(int value, JSObject buffer);
 

@@ -10,9 +10,9 @@ import org.teavm.jso.typedarrays.Float32Array;
 import coffee.mason.blacktar.canvas.CanvasGL;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
-import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.glmatrix.GLMatrix;
 import coffee.mason.blacktar.javascript.Float32ArrayUtil;
+import coffee.mason.blacktar.linear.Mat4x4;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
 
@@ -20,24 +20,25 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 
 	private static final String[] VERTEX = {
 			"precision mediump float;",
-			"attribute vec3 vertPosition;",
-			"varying vec3 vertColor;",
+			"attribute vec3 triPosition;",
+			"varying vec3 triColor;",
+//			"attribute vec3 triNormal;",
 			"uniform mat4 mProj;",
 			"uniform mat4 mView;",
 			"uniform mat4 mWorld;",
 			"void main()",
 			"{",
-				"vertColor = vec3(vertPosition.x + 0.2, vertPosition.y + 0.1, vertPosition.z + 0.4);",
-				"gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);",
+				"triColor = vec3(triPosition.x + 0.2, triPosition.y + 0.1, triPosition.z + 0.4);",
+				"gl_Position = mProj * mView * mWorld * vec4(triPosition, 1.0);",
 			"}"
 	};
 	
 	private static final String[] FRAG = {
 			"precision mediump float;",
-			"varying vec3 vertColor;",
+			"varying vec3 triColor;",
 			"void main()",
 			"{",
-				"gl_FragColor = vec4(vertColor, 1.0);",
+				"gl_FragColor = vec4(triColor, 1.0);",
 			"}"
 	};
 	
@@ -45,7 +46,8 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		super(fullscreen);
 	}
 	
-	private Float32Array proj;
+//	private Float32Array proj;
+	private Mat4x4 proj;
 	private Float32Array world;
 	private Float32Array view;
 	
@@ -60,7 +62,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		
 		TouchControls.register(this, this);
 
-		proj = (Float32Array) Float32Array.create(16);
+//		proj = (Float32Array) Float32Array.create(16);
 		world = (Float32Array) Float32Array.create(16);
 		view = (Float32Array) Float32Array.create(16);
 		
@@ -96,7 +98,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		}
 
 		// Need to create graphics program (graphics pipeline)
-		JSObject program = gl.createProgram(gl());
+		JSObject program = gl.createProgram();
 
 		gl.attachShader(program, vertexShader);
 		gl.attachShader(program, fragShader);
@@ -168,7 +170,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 				
 				);
 
-		JSObject floatBuffer = gl.createBuffer(gl());
+		JSObject floatBuffer = gl.createBuffer();
 
 		// Set as active buffer.
 		gl.bindBuffer(GL.ARRAY_BUFFER, floatBuffer);
@@ -176,35 +178,41 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		// Put data in active buffer.
 		gl.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
 
-		int attribLocation = gl.getAttribLocation(program, "vertPosition");
+		int triPositionAttrib = gl.getAttribLocation(program, "triPosition");
 
 		// Setting up attrib
 		// index, size (# of elements per attrib), type, normalized, stride, offset
-		gl.vertexAttribPointer(attribLocation, 3, GL.FLOAT, false, 3 * 4, 0);
-		gl.enableVertexAttribArray(attribLocation);
+		gl.vertexAttribPointer(triPositionAttrib, 3, GL.FLOAT, false, 3 * 4, 0);
+		gl.enableVertexAttribArray(triPositionAttrib);
+		
+		// Create normals
+		
+//		int triNormalAttrib = gl.getAttribLocation(program, "triNormal");
+//		
+//		gl.vertexAttribPointer(triNormalAttrib, 1, GL.FLOAT, false, 3*4, 0);
+//		gl.enableVertexAttribArray(triNormalAttrib);
 
-		JSObject colorBuffer = gl.createBuffer(gl());
+		JSObject colorBuffer = gl.createBuffer();
 
 		gl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer);
-
-		int colorLocation = 1; // GL.getAttribLocation(program, "vertColor");
-
-		gl.vertexAttribPointer(colorLocation, 3, GL.FLOAT, false, 3 * 4, 3 * 4);
-		gl.enableVertexAttribArray(colorLocation);
 
 		gl.useProgram(program);
 		
 		// Enable depth testing & culling
 		gl.frontFace(GL.CCW);
 		gl.cullFace(GL.BACK);
-		gl().enable(GL.DEPTH_TEST);
+		gl.enable(GL.DEPTH_TEST);
 		
 		projUniformLocation = gl.getUniformLocation(program, "mProj");
 		viewUniformLocation = gl.getUniformLocation(program, "mView");
 		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
 		
 		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
-		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		
+		
+//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		
 		GLMatrix.identity(world);
 
 		System.out.println(world.get(0) + " SHOULD BE 1 - IF IT IS GLMATRIX IS WORKING.");
@@ -214,7 +222,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	}
 
 	private void uniformMatrix4fv() {
-		gl.uniformMatrix4fv(projUniformLocation, false, proj);
+		gl.uniformMatrix4fv(projUniformLocation, false, proj.getArray());
 		gl.uniformMatrix4fv(viewUniformLocation, false, view);
 		gl.uniformMatrix4fv(worldUniformLocation, false, world);
 	}
@@ -242,13 +250,20 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 
 		gl.viewport(0, 0, (float) getWidth(), (float) getHeight());
 
-		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		
+//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		
 		uniformMatrix4fv();
 
-		System.out.println("Updated projection matrix: [" + proj.get(0) + ", " + proj.get(1) + ", " + proj.get(2) + ", "
-				+ proj.get(3) + ", " + proj.get(4) + ", " + proj.get(5) + ", " + proj.get(6) + ", " + proj.get(7) + ", "
-				+ proj.get(8) + ", " + proj.get(9) + ", " + proj.get(10) + ", " + proj.get(11) + ", " + proj.get(12)
-				+ ", " + proj.get(13) + ", " + proj.get(14) + ", " + proj.get(15) + "]");
+//		System.out.println("Updated projection matrix: [" + proj.get(0) + ", " + proj.get(1) + ", " + proj.get(2) + ", "
+//				+ proj.get(3) + ", " + proj.get(4) + ", " + proj.get(5) + ", " + proj.get(6) + ", " + proj.get(7) + ", "
+//				+ proj.get(8) + ", " + proj.get(9) + ", " + proj.get(10) + ", " + proj.get(11) + ", " + proj.get(12)
+//				+ ", " + proj.get(13) + ", " + proj.get(14) + ", " + proj.get(15) + "]");
+//		
+		
+		System.out.println("Updated projection matrix:\n" + proj.toString());
 	}
 
 	@Override
@@ -308,9 +323,10 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	}
 
 	@Override
-	public void handleTouchMove(MouseEvent e) {
+	public void handleTouchMove(Event e) {
+		MouseEvent me = (MouseEvent) e;
 		if (isTouched) {
-			System.out.println("Touch move " + e.getClientX() + ", " + e.getClientY());
+			System.out.println("Touch move " + me.getClientX() + ", " + me.getClientY());
 			
 		}
 	}
@@ -325,8 +341,15 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	@Override
 	public void handleTouchCancel(Event e) {
 		isTouched = false;
+		spinPaused = !spinPaused;
 		System.out.println("Touch cancel");
 		
+	}
+
+	@Override
+	public void handleTouchOut(Event e) {
+		isTouched = false;
+		System.out.println("Touch out");
 	}
 
 }
