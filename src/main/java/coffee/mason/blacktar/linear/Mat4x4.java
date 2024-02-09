@@ -20,5 +20,28 @@ public class Mat4x4 extends MatWxH {
 		return returnable;
 		
 	}
+	
+	// Derminant for only the 3x3 dimensions in the 4x4.
+	public float det3x3() {
+		float a = getValue(0);
+		float b = getValue(1);
+		float c = getValue(2);
+		float d = getValue(4);
+		float e = getValue(5);
+		float f = getValue(6);
+		float g = getValue(8);
+		float h = getValue(9);
+		float i = getValue(10);
+		return (a*e*i - a*f*h - b*d*c + b*f*g + c*d*f - c*e*g);
+	}
+
+
+	public static Mat4x4 identity() {
+		Mat4x4 returnable = new Mat4x4();
+		for (int i = 0; i < 4; i++) {
+			returnable.setValue(i, i, 1f);
+		}
+		return returnable;
+	}
 
 }

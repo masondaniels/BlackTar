@@ -46,12 +46,11 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		super(fullscreen);
 	}
 	
-//	private Float32Array proj;
 	private Mat4x4 proj;
 	private Float32Array world;
 	private Float32Array view;
 	
-	private Float32Array identity;
+	private Mat4x4 identity;
 	
 	private int projUniformLocation;
 	private int viewUniformLocation;
@@ -62,11 +61,9 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		
 		TouchControls.register(this, this);
 
-//		proj = (Float32Array) Float32Array.create(16);
 		world = (Float32Array) Float32Array.create(16);
 		view = (Float32Array) Float32Array.create(16);
-		
-		identity = (Float32Array) Float32ArrayUtil.of(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+		identity = Mat4x4.identity();
 		
 		setupShader();
 
@@ -185,7 +182,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		gl.vertexAttribPointer(triPositionAttrib, 3, GL.FLOAT, false, 3 * 4, 0);
 		gl.enableVertexAttribArray(triPositionAttrib);
 		
-		// Create normals
+		// TODO: Create normals
 		
 //		int triNormalAttrib = gl.getAttribLocation(program, "triNormal");
 //		
@@ -209,11 +206,9 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		
 		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
 		
-		
-//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		
-		GLMatrix.identity(world);
+
+		world = identity.getArray();
 
 		System.out.println(world.get(0) + " SHOULD BE 1 - IF IT IS GLMATRIX IS WORKING.");
 
@@ -250,19 +245,10 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 
 		gl.viewport(0, 0, (float) getWidth(), (float) getHeight());
 
-//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		
-//		GLMatrix.perspective(proj, (float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 		
 		uniformMatrix4fv();
 
-//		System.out.println("Updated projection matrix: [" + proj.get(0) + ", " + proj.get(1) + ", " + proj.get(2) + ", "
-//				+ proj.get(3) + ", " + proj.get(4) + ", " + proj.get(5) + ", " + proj.get(6) + ", " + proj.get(7) + ", "
-//				+ proj.get(8) + ", " + proj.get(9) + ", " + proj.get(10) + ", " + proj.get(11) + ", " + proj.get(12)
-//				+ ", " + proj.get(13) + ", " + proj.get(14) + ", " + proj.get(15) + "]");
-//		
-		
 		System.out.println("Updated projection matrix:\n" + proj.toString());
 	}
 
@@ -289,9 +275,9 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 				pausedLast = 0;
 			}
 			
-			angle = (float) ((float) Math.cos(((t-pausedTime) / (2f * (float) Math.PI)) * 3)*Math.PI * 2f);
+			angle = (float) ((float) Math.cos(((t-pausedTime) / (2f * (float) Math.PI))));
 		
-			GLMatrix.rotate(world, identity, angle, 3, 2, 1);
+			GLMatrix.rotate(world, identity.getArray(), angle/100f, 3, 2, 1);
 			gl.uniformMatrix4fv(worldUniformLocation, false, world);
 			
 		} else {

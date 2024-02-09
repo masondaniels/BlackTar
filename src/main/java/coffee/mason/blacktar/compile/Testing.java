@@ -1,9 +1,13 @@
 package coffee.mason.blacktar.compile;
 
 import org.teavm.jso.dom.html.HTMLDocument;
+import org.teavm.jso.typedarrays.Float32Array;
 
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl;
 import coffee.mason.blacktar.canvas.impl.CanvasTouchImpl;
+import coffee.mason.blacktar.canvas.webgl.GL;
+import coffee.mason.blacktar.canvas.webgl.Mesh;
+import coffee.mason.blacktar.javascript.Float32ArrayUtil;
 import coffee.mason.blacktar.linear.MatWxH;
 import coffee.mason.blacktar.linear.Vec3;
 
@@ -22,6 +26,73 @@ public class Testing {
 		CanvasTouchImpl timpl = new CanvasTouchImpl(true); // touch
 		
 		testMatrices();
+		testVecCross();
+//		testCubeWinding();
+	}
+	
+	private static void testVecCross() {
+		Vec3 v = new Vec3(1,0,0);
+		Vec3 w = new Vec3(0,1,0);
+		
+		System.out.println("[1, 0, 0] cross [0, 1, 0] = " + Vec3.cross(v, w));
+	}
+	
+	private static void testCubeWinding() {
+		Mesh m = new Mesh();
+		Float32Array array = (Float32Array) Float32ArrayUtil.of(
+				
+				// front face
+				0.5f, 0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				0.5f, -0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				0.5f, 0.5f, 0f,
+				
+				// back face
+				0.5f, 0.5f, 1f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 1f,
+				-0.5f, 0.5f, 1f,
+				-0.5f, -0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				
+				// bottom face
+				0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 0f,
+				-0.5f, -0.5f, 1f,
+				0.5f, -0.5f, 1f,
+				
+				// top face
+				0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				
+				// left face
+				-0.5f, -0.5f, 0f,
+				-0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 1f,
+				
+				// right face
+				0.5f, 0.5f, 0f,
+				0.5f, -0.5f, 0f,
+				0.5f, -0.5f, 1f,
+				
+				0.5f, -0.5f, 1f,
+				0.5f, 0.5f, 1f,
+				0.5f, 0.5f, 0f
+				
+				);
+		m.setTriangles(array);
+//		m.checkWinding();
+//		m.fixWinding();
+//		m.fixWinding();
+//		m.checkWinding();
 	}
 
 	private static void testMatrices() {
