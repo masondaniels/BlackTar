@@ -1,7 +1,5 @@
 package coffee.mason.blacktar.canvas.impl;
 
-import java.util.Iterator;
-
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.events.Event;

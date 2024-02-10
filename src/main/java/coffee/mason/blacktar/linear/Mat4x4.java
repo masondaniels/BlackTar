@@ -41,6 +41,8 @@ public class Mat4x4 extends MatWxH {
 		for (int i = 0; i < 4; i++) {
 			returnable.setValue(i, i, 1f);
 		}
+		// . . . .
+		System.out.println("Identity(0) = " + returnable.getValue(0) + " Identity(1, 1) = " + returnable.getValue(5));
 		return returnable;
 	}
 

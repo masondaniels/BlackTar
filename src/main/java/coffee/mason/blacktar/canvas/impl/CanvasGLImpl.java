@@ -1,22 +1,27 @@
 package coffee.mason.blacktar.canvas.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.events.Event;
+import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.typedarrays.Float32Array;
 
 import coffee.mason.blacktar.canvas.CanvasGL;
+import coffee.mason.blacktar.canvas.controls.KeyboardControls;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
-import coffee.mason.blacktar.glmatrix.GLMatrix;
 import coffee.mason.blacktar.javascript.Float32ArrayUtil;
 import coffee.mason.blacktar.linear.Mat4x4;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
 
-public class CanvasGLImpl extends CanvasGL implements TouchControls {
+public class CanvasGLImpl extends CanvasGL implements TouchControls, KeyboardControls {
 
 	private static final String[] VERTEX = {
 			"precision mediump float;",
@@ -48,7 +53,8 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	
 	private Mat4x4 proj;
 	private Float32Array world;
-	private Float32Array view;
+//	private Float32Array view;
+	private Mat4x4 view;
 	
 	private Mat4x4 identity;
 	
@@ -60,9 +66,11 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	public void loadBeforeAnimation() {
 		
 		TouchControls.register(this, this);
+		KeyboardControls.register(this);
 
 		world = (Float32Array) Float32Array.create(16);
-		view = (Float32Array) Float32Array.create(16);
+//		view = (Float32Array) Float32Array.create(16);
+		view = Mat4x4.identity();
 		identity = Mat4x4.identity();
 		
 		setupShader();
@@ -204,13 +212,30 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 		viewUniformLocation = gl.getUniformLocation(program, "mView");
 		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
 		
-		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
+//		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
+//		System.out.println("View matrix:");
+//		Float32ArrayUtil.print(view, 4);
+//		
+		
+//		view = (Float32Array) Float32ArrayUtil.of(-1.0f,0,0,0,
+//													0,1.0f,0,0,
+//													0,0,-1.0f,0,
+//													0,0,-3.5f,1.0f);
+		
+//		view.setValue(0, -1f);
+//		view.setValue(2, 2, -1f);
+		view.setValue(2, 3, -3.5f);
+		
+//		view = identity.getArray();
+//		view.set(0, -1f);
+//		view.set(10, -1f);
+//		view.set(14, -3.5f);
+//		System.out.println("View matrix:");
+//		Float32ArrayUtil.print(view, 4);
 		
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 
 		world = identity.getArray();
-
-		System.out.println(world.get(0) + " SHOULD BE 1 - IF IT IS GLMATRIX IS WORKING.");
 
 		uniformMatrix4fv();
 
@@ -218,7 +243,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 
 	private void uniformMatrix4fv() {
 		gl.uniformMatrix4fv(projUniformLocation, false, proj.getArray());
-		gl.uniformMatrix4fv(viewUniformLocation, false, view);
+		gl.uniformMatrix4fv(viewUniformLocation, false, view.getArray());
 		gl.uniformMatrix4fv(worldUniformLocation, false, world);
 	}
 
@@ -277,8 +302,8 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 			
 			angle = (float) ((float) Math.cos(((t-pausedTime) / (2f * (float) Math.PI))));
 		
-			GLMatrix.rotate(world, identity.getArray(), angle/100f, 3, 2, 1);
-			gl.uniformMatrix4fv(worldUniformLocation, false, world);
+//			GLMatrix.rotate(world, identity.getArray(), angle/100f, 3, 2, 1);
+//			gl.uniformMatrix4fv(worldUniformLocation, false, world);
 			
 		} else {
 			
@@ -336,6 +361,77 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls {
 	public void handleTouchOut(Event e) {
 		isTouched = false;
 		System.out.println("Touch out");
+	}
+
+//	@Override
+//	public void handleKeyDown(Event e) {
+//		System.out.println("Key down:" + ((KeyboardEvent)e).getCharCode());
+//
+//		
+//	}
+//
+//	@Override
+//	public void handleKeyUp(Event e) {
+//		System.out.println("Key up:" + ((KeyboardEvent)e).getCharCode());
+//
+//	}
+	
+	private static final int VK_W = 119;
+	private static final int VK_A = 97;
+	private static final int VK_S = 115;
+	private static final int VK_D = 100;
+	
+	private static final int VK_SPACE = 32;
+
+	@Override
+	public void handleKeyPress(Event e) {
+		int value = ((KeyboardEvent)e).getCharCode();
+		System.out.println("Key pressed: " + value);
+
+		switch (value) {
+		case VK_W:
+			view.setValue(14, view.getValue(14)+0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+			break;
+		case VK_A:
+			view.setValue(12, view.getValue(12)+0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+			break;
+		case VK_S:
+			view.setValue(14, view.getValue(14)-0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+			break;
+		case VK_D:
+			view.setValue(12, view.getValue(12)-0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+			break;
+		case VK_SPACE:
+			view.setValue(13, view.getValue(13)-0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+			break;
+
+		default:
+			break;
+		}
+		
+	}
+
+	private HashMap<String, Object> keysDown = new HashMap<String, Object>();
+	
+	@Override
+	public void handleKeyDown(Event e) {
+		System.out.println("Key down: "+ ((KeyboardEvent) e).getKey());
+		keysDown.put(((KeyboardEvent) e).getKey().toLowerCase(), null);
+		if (((KeyboardEvent) e).isShiftKey()) {
+			view.setValue(13, view.getValue(13)+0.1f);
+			gl().uniformMatrix4fv(viewUniformLocation, false, view.getArray());
+		}
+		System.out.println("Keys down: " + keysDown.size());
+	}
+
+	@Override
+	public void handleKeyUp(Event e) {
+		keysDown.remove(((KeyboardEvent) e).getKey().toLowerCase());
 	}
 
 }
