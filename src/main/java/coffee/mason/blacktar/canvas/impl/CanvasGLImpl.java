@@ -212,26 +212,7 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls, KeyboardCon
 		viewUniformLocation = gl.getUniformLocation(program, "mView");
 		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
 		
-//		GLMatrix.lookAt(view, 0, 0, -3.5f, 0, 0, 0, 0, 1, 0);
-//		System.out.println("View matrix:");
-//		Float32ArrayUtil.print(view, 4);
-//		
-		
-//		view = (Float32Array) Float32ArrayUtil.of(-1.0f,0,0,0,
-//													0,1.0f,0,0,
-//													0,0,-1.0f,0,
-//													0,0,-3.5f,1.0f);
-		
-//		view.setValue(0, -1f);
-//		view.setValue(2, 2, -1f);
 		view.setValue(2, 3, -3.5f);
-		
-//		view = identity.getArray();
-//		view.set(0, -1f);
-//		view.set(10, -1f);
-//		view.set(14, -3.5f);
-//		System.out.println("View matrix:");
-//		Float32ArrayUtil.print(view, 4);
 		
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
 
@@ -285,38 +266,14 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls, KeyboardCon
 		}
 
 	}
-	
-	private float angle;
-	private boolean spinPaused;
-	private float pausedLast;
-	private float pausedTime;
+
 	
 	@Override
 	public void draw() {
-		float t = JavaScriptUtil.getElapsed().floatValue() / 1000f;
-		if (!spinPaused) {
-			if (pausedLast != 0) {
-				pausedTime += (t-pausedLast);
-				pausedLast = 0;
-			}
-			
-			angle = (float) ((float) Math.cos(((t-pausedTime) / (2f * (float) Math.PI))));
-		
-//			GLMatrix.rotate(world, identity.getArray(), angle/100f, 3, 2, 1);
-//			gl.uniformMatrix4fv(worldUniformLocation, false, world);
-			
-		} else {
-			
-			if (pausedLast == 0) {
-				pausedLast = t;
-			}
-		}
-		
 		gl.clearColor(0f, 0f, 0f, 1f);
 		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
 		gl.drawArrays(GL.TRIANGLES, 0, 18+6+3+6);
-//		gl.drawArrays(GL.TRIANGLES, 0, 18);
 		
 	}
 
@@ -345,14 +302,12 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls, KeyboardCon
 	@Override
 	public void handleTouchEnd(Event e) {
 		isTouched = false;
-		spinPaused = !spinPaused;
 		System.out.println("Touch end");
 	}
 
 	@Override
 	public void handleTouchCancel(Event e) {
 		isTouched = false;
-		spinPaused = !spinPaused;
 		System.out.println("Touch cancel");
 		
 	}
@@ -434,4 +389,8 @@ public class CanvasGLImpl extends CanvasGL implements TouchControls, KeyboardCon
 		keysDown.remove(((KeyboardEvent) e).getKey().toLowerCase());
 	}
 
+	public Mat4x4 getView() {
+		return view;
+	}
+	
 }
