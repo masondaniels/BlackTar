@@ -277,5 +277,8 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 	}
 
 
+	public KeyboardControls getKeyboardControls() {
+		return keyboardControls;
+	}
 
 }

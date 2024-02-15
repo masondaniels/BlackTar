@@ -1,10 +1,14 @@
 package coffee.mason.blacktar.compile;
 
 import org.teavm.jso.dom.html.HTMLDocument;
+
 import coffee.mason.blacktar.canvas.Canvas2D;
+import coffee.mason.blacktar.canvas.controls.impl.Camera;
+import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
 import coffee.mason.blacktar.linear.MatWxH;
 import coffee.mason.blacktar.linear.Vec3;
+import coffee.mason.blacktar.util.JavaScriptUtil;
 
 public class Testing {
 
@@ -93,16 +97,23 @@ public class Testing {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 			@Override
 			public void draw() {
 				getCtx().clearRect(0, 0, getWidth(), 100);
 				getCtx().setFillStyle("white");
-//				String x = JavaScriptUtil.numToFixed(0-glImpl.getView().getValue(12), 2);
-//				String y = JavaScriptUtil.numToFixed(0-glImpl.getView().getValue(13), 2);
-//				String z = JavaScriptUtil.numToFixed(0-glImpl.getView().getValue(14), 2);
-//				getCtx().fillText("(" + x + ", " + y + ", " + z + ")", 10, 20);
-				getCtx().fillText("(null, null, null)", 10, 20);
+
+				Camera camera = ((FpsKeyboardControls) glImpl.getKeyboardControls()).getCamera();
+
+				String x = JavaScriptUtil.numToFixed(camera.getPosX(), 2);
+				String y = JavaScriptUtil.numToFixed(camera.getPosY(), 2);
+				String z = JavaScriptUtil.numToFixed(camera.getPosZ(), 2);
+				getCtx().fillText("P = (" + x + ", " + y + ", " + z + ")", 10, 20);
+				getCtx().fillText(
+						"L = (" + JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(0), 2) + ","
+								+ JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(1), 2) + ","
+								+ JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(2), 2) + ")",
+						10, 30); // getRefreshCount(), getHeight() looked weird! like a loading bar, prefilled
 			}
 		};
 		view.setZIndex(2);

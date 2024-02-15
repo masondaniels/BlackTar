@@ -20,6 +20,7 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 		this.gl = gl;
 		this.viewUniformLocation = viewUniformLocation;
 		camera.setPosZ(3f);
+		camera.setYaw(-90f);
 		camera.updateViewDirection();
 		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
 		KeyboardControls.register(this);
@@ -48,10 +49,10 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 
 	private float speed = 0.3f;
 	private float angleSpeed = 1f;
-	
+
 	private boolean movedPosition;
 	private boolean movedEye;
-	
+
 	@Override
 	public void update() {
 
@@ -79,33 +80,44 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 			movedPosition = true;
 			camera.moveDown(speed);
 		}
-		
+
 		if (keysDown.containsKey("arrowright")) {
 			movedEye = true;
-			camera.setYaw(camera.getYaw()-angleSpeed);
+			camera.setYaw(camera.getYaw() - angleSpeed);
 		}
-		
+
 		if (keysDown.containsKey("arrowleft")) {
 			movedEye = true;
-			camera.setYaw(camera.getYaw()+angleSpeed);
+			camera.setYaw(camera.getYaw() + angleSpeed);
 		}
-		
+
 		if (keysDown.containsKey("arrowdown")) {
 			movedEye = true;
-			camera.setPitch(camera.getPitch()-angleSpeed);
+			camera.setPitch(camera.getPitch() - angleSpeed);
 		}
-		
+
 		if (keysDown.containsKey("arrowup")) {
-			camera.setPitch(camera.getPitch()+angleSpeed);
+			movedEye = true;
+			camera.setPitch(camera.getPitch() + angleSpeed);
 		}
-		
+
 		if (movedEye) {
 			camera.updateViewDirection();
 		}
 
 		if (movedEye || movedPosition) {
 			gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
+			if (movedPosition) {
+				movedPosition = false;
+			}
+			if (movedEye) {
+				movedEye = false;
+			}
 		}
 	}
 
+	public Camera getCamera() {
+		return camera;
+	}
+	
 }

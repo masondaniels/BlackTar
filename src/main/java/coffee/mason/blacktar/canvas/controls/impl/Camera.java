@@ -8,6 +8,7 @@ public class Camera {
 //	private Vec3 lookingAt = new Vec3();
 	private Vec3 position = new Vec3();
 	private Vec3 viewDirection;
+	private Vec3 forwardDirection;
 
 	private static Vec3 up = new Vec3();
 
@@ -17,6 +18,7 @@ public class Camera {
 	
 	public Camera() {
 		viewDirection = new Vec3(0, 0, -1f);
+		forwardDirection = viewDirection;
 	}
 
 	public Vec3 getPosition() {
@@ -28,20 +30,20 @@ public class Camera {
 	}
 	
 	public void moveForward(float distance) {
-		position = (Vec3) position.add(viewDirection.scale(distance));
+		position = (Vec3) position.add(forwardDirection.scale(distance));
 	}
 	
 	public void moveBackwards(float distance) {
-		position = (Vec3) position.sub(viewDirection.scale(distance));
+		position = (Vec3) position.sub(forwardDirection.scale(distance));
 	}
 	
 	public void strafeLeft(float distance) {
-		Vec3 strafeDirection = Vec3.cross(viewDirection, Camera.up);
+		Vec3 strafeDirection = Vec3.cross(forwardDirection, Camera.up);
 		position = (Vec3) position.add(strafeDirection.scale(distance));
 	}
 	
 	public void strafeRight(float distance) {
-		Vec3 strafeDirection = Vec3.cross(viewDirection, Camera.up);
+		Vec3 strafeDirection = Vec3.cross(forwardDirection, Camera.up);
 		position = (Vec3) position.sub(strafeDirection.scale(distance));
 	}
 	
@@ -68,6 +70,7 @@ public class Camera {
 
 	    // Update the view direction
 	    viewDirection = new Vec3(x, y, z).normalize();
+	    forwardDirection = viewDirection.remove(Camera.up).normalize();
 	}
 
 	
@@ -116,18 +119,6 @@ public class Camera {
 		position.setValue(2, v);
 	}
 
-//	public void setLookX(float v) {
-//		lookingAt.setValue(0, v);
-//	}
-//
-//	public void setLookY(float v) {
-//		lookingAt.setValue(1, v);
-//	}
-//
-//	public void setLookZ(float v) {
-//		lookingAt.setValue(2, v);
-//	}
-
 	public float getPosX() {
 		return position.getValue(0);
 	}
@@ -145,7 +136,7 @@ public class Camera {
 	}
 
 	public void setYaw(float yaw) {
-		this.yaw = yaw;
+	    this.yaw = (yaw % 360 + 360) % 360;
 	}
 
 	public float getPitch() {
@@ -153,19 +144,11 @@ public class Camera {
 	}
 
 	public void setPitch(float pitch) {
-		this.pitch = pitch;
+		 this.pitch = Math.max(-90, Math.min(90, pitch));
 	}
-	
-//	public float getLookX() {
-//		return lookingAt.getValue(0);
-//	}
-//	
-//	public float getLookY() {
-//		return lookingAt.getValue(1);
-//	}
-//	
-//	public float getLookZ() {
-//		return lookingAt.getValue(2);
-//	}
+
+	public void setViewDirection(Vec3 viewDirection) {
+		this.viewDirection = viewDirection;
+	}
 
 }
