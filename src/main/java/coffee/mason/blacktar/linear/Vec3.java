@@ -31,12 +31,16 @@ public class Vec3 extends VecN {
 				v.getValue(0) * w.getValue(1) - w.getValue(0) * v.getValue(1));
 	}
 	
+	public Vec3 normalize() {
+		return Vec3.normalize(this);
+	}
+	
 	public static Vec3 normalize(Vec3 v) {
 		float magnitude = (float) Math.sqrt(Math.pow(v.getValue(0), 2) + Math.pow(v.getValue(1), 2) + Math.pow(v.getValue(2), 2));
 		Vec3 returnable = new Vec3();
 		if (magnitude != 0) {
 			for (int i = 0; i < 3; i++) {
-				returnable.setValue(i, v.getValue(i)/magnitude);
+				returnable.setValue(i, (float) v.getValue(i)/magnitude);
 			}
 			return returnable;
 		} else {
@@ -50,6 +54,15 @@ public class Vec3 extends VecN {
 			sum+= v.getValue(i) * w.getValue(i);
 		}
 		return sum;
+	}
+
+	public Vec3 multiply(float distance) {
+		Vec3 copy = new Vec3(getValue(0), getValue(1), getValue(2));
+		for (int i = 0; i < 3; i++) {
+			copy.setValue(i, getValue(i)*distance);
+		}
+		return copy;
+		
 	}
 
 }

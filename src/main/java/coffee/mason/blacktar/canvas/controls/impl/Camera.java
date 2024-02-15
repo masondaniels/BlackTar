@@ -5,53 +5,75 @@ import coffee.mason.blacktar.linear.Vec3;
 
 public class Camera {
 
-	private Vec3 lookingAt = new Vec3();
+	private Quaternion rotation;
 	private Vec3 position = new Vec3();
+	private float pitch; // deg
+	private float yaw; // deg
+	private float roll; // deg
 
-	private static Vec3 up = new Vec3();
+	public static Vec3 up = new Vec3();
 
 	static {
 		up.setValue(1, 1); // y is up
+	}
+
+	public Camera() {
+		rotation = Quaternion.fromEulerAngles(pitch, yaw, roll);
+	}
+
+	public Camera(float posX, float posY, float posZ, float pitch, float yaw, float roll) {
+		this.position = new Vec3(posX, posY, posZ);
+		this.rotation = Quaternion.fromEulerAngles(pitch, yaw, roll);
+	}
+
+	public void rotate(float pitch, float yaw, float roll) {
+		Quaternion rotationDelta = Quaternion.fromEulerAngles(pitch, yaw, roll);
+		rotation = rotation.multiply(rotationDelta).normalize();
+	}
+
+	public void move(float dx, float dy, float dz) {
+		Vec3 movement = rotation.rotateVector(new Vec3(dx, dy, dz));
+		position = (Vec3) position.add(movement);
+	}
+
+	public void moveForward(float distance) {
+		Vec3 forward = rotation.rotateVector(new Vec3(0, 0, -1)).normalize();
+		forward = forward.multiply(distance);
+		position = (Vec3) position.add(forward);
+	}
+
+	public void moveBackward(float distance) {
+		Vec3 forward = rotation.rotateVector(new Vec3(0, 0, 1)).normalize();
+		forward = forward.multiply(distance);
+		position = (Vec3) position.add(forward);
+	}
+
+	public void moveLeft(float distance) {
+		Vec3 right = rotation.rotateVector(new Vec3(1, 0, 0)).normalize();
+		right = right.multiply(-distance);
+		position = (Vec3) position.add(right);
+	}
+
+	public void moveRight(float distance) {
+		Vec3 right = rotation.rotateVector(new Vec3(1, 0, 0)).normalize();
+		right = right.multiply(distance);
+		position = (Vec3) position.add(right);
 	}
 
 	public Vec3 getPosition() {
 		return position;
 	}
 
-	public Vec3 getLookingAt() {
-		return lookingAt;
-	}
-
 	public Mat4x4 getViewMatrix() {
-		// Using lookingAt and position, return new view matrix
-		Vec3 forward = Vec3.normalize((Vec3) lookingAt.sub(position));
-		Vec3 right = Vec3.normalize(Vec3.cross(Camera.up, forward));
-		Vec3 up = Vec3.normalize(Vec3.cross(forward, right));
 
-		Mat4x4 viewMatrix = new Mat4x4();
-		viewMatrix.setValue(0, 0, right.getValue(0)); // right.x
-		viewMatrix.setValue(1, 0, up.getValue(0)); // up.x
-		viewMatrix.setValue(2, 0, -1*(forward.getValue(0))); // forward.x
+		Mat4x4 translationMatrix = Mat4x4.identity();
+		translationMatrix.setValue(3, 0, -getPosX());
+		translationMatrix.setValue(3, 1, -getPosY());
+		translationMatrix.setValue(3, 2, -getPosZ());
 
-		viewMatrix.setValue(0, 1, right.getValue(1)); // right.y
-		viewMatrix.setValue(1, 1, up.getValue(1)); // up.y
-		viewMatrix.setValue(2, 1, -1*(forward.getValue(1))); // forward.y
+		Mat4x4 rotationMatrix = rotation.toMatrix();
 
-		viewMatrix.setValue(0, 2, right.getValue(2)); // right.z
-		viewMatrix.setValue(1, 2, up.getValue(2)); // up.z
-		viewMatrix.setValue(2, 2, -1*(forward.getValue(2))); // forward.z
-
-		
-
-		viewMatrix.setValue(0, 3, -1*Vec3.dot(right, position));
-		viewMatrix.setValue(1, 3, -1*Vec3.dot(up, position));
-		viewMatrix.setValue(2, 3, Vec3.dot(forward, position));
-		
-		viewMatrix.setValue(3, 3, 1); // w
-		
-		System.out.println("View matrix:\n" + viewMatrix);
-
-		return viewMatrix;
+		return (Mat4x4) Mat4x4.matrixProduct(translationMatrix, rotationMatrix);
 
 	}
 
@@ -67,18 +89,6 @@ public class Camera {
 		position.setValue(2, v);
 	}
 
-	public void setLookX(float v) {
-		lookingAt.setValue(0, v);
-	}
-
-	public void setLookY(float v) {
-		lookingAt.setValue(1, v);
-	}
-
-	public void setLookZ(float v) {
-		lookingAt.setValue(2, v);
-	}
-
 	public float getPosX() {
 		return position.getValue(0);
 	}
@@ -90,17 +100,34 @@ public class Camera {
 	public float getPosZ() {
 		return position.getValue(2);
 	}
-	
-	public float getLookX() {
-		return lookingAt.getValue(0);
+
+	public float getPitch() {
+		return pitch;
 	}
-	
-	public float getLookY() {
-		return lookingAt.getValue(1);
+
+	public void setPitch(float pitch) {
+		this.pitch = pitch;
 	}
-	
-	public float getLookZ() {
-		return lookingAt.getValue(2);
+
+	public float getYaw() {
+		return yaw;
+	}
+
+	public void setYaw(float yaw) {
+		this.yaw = yaw;
+	}
+
+	public float getRoll() {
+		return roll;
+	}
+
+	public void setRoll(float roll) {
+
+		this.roll = roll;
+	}
+
+	public Quaternion getRotation() {
+		return rotation;
 	}
 
 }

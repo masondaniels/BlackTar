@@ -69,7 +69,7 @@ public class MatWxH {
 
 	public static MatWxH matrixProduct(MatWxH a, MatWxH b) {
 		if (!multiplicationValid(a, b)) {
-			System.err.println("a.h != b.w: Matrix multiplication not valid.");
+			System.err.println("a.h != b.w (" + a.h + " != " + b.w + "): Matrix multiplication not valid.");
 			throw new UnsupportedOperationException("Matrix multiplication not valid.");
 		}
 
