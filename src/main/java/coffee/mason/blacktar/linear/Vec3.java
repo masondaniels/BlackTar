@@ -1,7 +1,5 @@
 package coffee.mason.blacktar.linear;
 
-import java.util.Iterator;
-
 public class Vec3 extends VecN {
 
 	public Vec3(float x, float y, float z) {

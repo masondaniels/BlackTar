@@ -1,11 +1,9 @@
 package coffee.mason.blacktar.canvas.impl;
 
-import java.util.HashMap;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.events.Event;
-import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.typedarrays.Float32Array;
 

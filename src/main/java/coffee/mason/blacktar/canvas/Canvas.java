@@ -29,16 +29,30 @@ public abstract class Canvas implements Updatable {
 
 	}
 
+	private long timeLast = -1; // in seconds
+	private int fpsLast;
+	private int fps;
+
 	public void requestAnimationFrame() {
 		refreshCount = getRefreshCount() + 1;
+		if (timeLast == -1) {
+			fps = 0;
+			timeLast = System.currentTimeMillis();
+		}
 		Window.requestAnimationFrame(timestamp -> {
+			if (System.currentTimeMillis()-timeLast > 1000) {
+				fpsLast = fps;
+				fps = 0;
+				timeLast = -1;
+			} else {
+				fps++;
+			}
 			update();
 			draw();
 			requestAnimationFrame();
 		});
 	}
 
-	
 	// Already implemented -- called whenever there is a resize
 	public void resizeCanvas(HTMLCanvasElement canvas) {
 		if (fullscreen) {
@@ -47,7 +61,8 @@ public abstract class Canvas implements Updatable {
 			setWidth(Window.current().getInnerWidth());
 			setHeight(Window.current().getInnerHeight());
 		}
-		onCanvasResize(); // Calls special methods (in implemented classes) on canvas resize if there are any
+		onCanvasResize(); // Calls special methods (in implemented classes) on canvas resize if there are
+							// any
 		draw();
 	}
 
@@ -60,7 +75,7 @@ public abstract class Canvas implements Updatable {
 	public abstract void loadAfterAnimation();
 
 	public abstract void draw();
-	
+
 	public abstract void onCanvasResize();
 
 	public double getWidth() {
@@ -96,12 +111,12 @@ public abstract class Canvas implements Updatable {
 	public int getRefreshCount() {
 		return refreshCount;
 	}
-	
+
 	// Returns context object
 	public JSObject getContext() {
 		return getCanvas().getContext(getContextType());
 	}
-	
+
 	// Call to set up canvas logic. Includes fullscreen logic.
 	public void setup() {
 		loadBeforeAnimation();
@@ -113,6 +128,10 @@ public abstract class Canvas implements Updatable {
 		}
 		requestAnimationFrame();
 		loadAfterAnimation();
+	}
+	
+	public int getFps() {
+		return fpsLast;//
 	}
 
 }
