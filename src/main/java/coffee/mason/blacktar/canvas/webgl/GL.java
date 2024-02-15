@@ -1,8 +1,5 @@
 package coffee.mason.blacktar.canvas.webgl;
 
-import org.teavm.jso.JSBody;
-import org.teavm.jso.JSObject;
-
 public class GL {
 
 	/**

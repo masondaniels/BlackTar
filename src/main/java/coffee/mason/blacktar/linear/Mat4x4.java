@@ -21,6 +21,11 @@ public class Mat4x4 extends MatWxH {
 		
 	}
 	
+//	public static Mat4x4 lookAt(float x, float y, float z, float upx, float upy, float upz) {
+//		Mat4x4 returnable = new Mat4x4();
+//		return returnable;
+//	}
+
 	// Derminant for only the 3x3 dimensions in the 4x4.
 	public float det3x3() {
 		float a = getValue(0);

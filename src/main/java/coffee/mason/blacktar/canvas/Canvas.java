@@ -6,9 +6,10 @@ import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 
 import coffee.mason.blacktar.canvas.webgl.WebGLContext;
+import coffee.mason.blacktar.component.Updatable;
 import coffee.mason.blacktar.util.RandomUtil;
 
-public abstract class Canvas {
+public abstract class Canvas implements Updatable {
 
 	protected HTMLCanvasElement canvas;
 	private String contextType;
@@ -57,8 +58,6 @@ public abstract class Canvas {
 	public abstract void loadBeforeAnimation();
 
 	public abstract void loadAfterAnimation();
-
-	public abstract void update();
 
 	public abstract void draw();
 	

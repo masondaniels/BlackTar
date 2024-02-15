@@ -28,4 +28,7 @@ public class JavaScriptUtil {
 	 */
 	@JSBody(params = "object", script = "if (!object) { return false; } return true;")
 	public static native boolean not(JSObject object);
+	
+	@JSBody(params = {"object", "value"}, script = "return Number(object).toFixed(value) + \"\";")
+	public static native String numToFixed(float value, int num);
 }
