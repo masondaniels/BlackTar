@@ -61,6 +61,18 @@ public class MatWxH {
 	public static boolean multiplicationValid(MatWxH a, MatWxH b) {
 		return a.h == b.w;
 	}
+	
+	public MatWxH scale(float scalar) {
+		return MatWxH.scale(this, scalar);
+	}
+	
+	public static MatWxH scale(MatWxH a, float scalar) {
+		MatWxH returnable = new MatWxH(a.w, a.h);
+		for (int i = 0; i < a.w * a.h; i++) {
+			returnable.setValue(i, a.getValue(i)*scalar);
+		}
+		return returnable;
+	}
 
 	// Computes matrix product
 	public MatWxH product(MatWxH other) {

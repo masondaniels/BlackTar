@@ -44,6 +44,10 @@ public class Vec3 extends VecN {
 		}
 	}
 	
+	public Vec3 normalize() {
+		return Vec3.normalize(this);
+	}
+	
 	public static float dot(Vec3 v, Vec3 w) {
 		float sum = 0;
 		for (int i = 0; i < 3; i++) {
