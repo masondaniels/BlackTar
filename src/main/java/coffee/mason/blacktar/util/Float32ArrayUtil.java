@@ -1,16 +1,24 @@
-package coffee.mason.blacktar.javascript;
+package coffee.mason.blacktar.util;
 
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.Float32Array;
 
-public class Float32ArrayUtil implements Any {
+public class Float32ArrayUtil {
 
     @JSBody(params = "elements", script = "return new Float32Array(elements);")
-    public static native JSObject of(float... elements);
+    public static native Float32Array of(float... elements);
+    
+    public static Float32Array of(double... elements) {
+    	float[] a = new float[elements.length];
+    	for (int i = 0; i < a.length; i++) {
+			a[i] = (float) elements[i];
+		}
+    	return of(a);
+    }
     
     @JSBody(params = "size", script = "return new Float32Array(size);")
-    public static native JSObject create(int size);
+    public static native Float32Array create(int size);
 
     // Print all elements
 	public static void print(Float32Array array, int mod) {

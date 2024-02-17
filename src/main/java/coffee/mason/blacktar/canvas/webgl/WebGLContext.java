@@ -58,6 +58,11 @@ public interface WebGLContext extends Any {
 
 	void uniformMatrix4fv(int location, boolean transpose, JSObject value);
 
+	void uniform1f(int location, float value);
+	
+	// Use Float32Array
+	void uniform3fv(int location, JSObject value);
+	
 	void cullFace(int mode);
 
 	void frontFace(int mode);

@@ -12,7 +12,7 @@ import coffee.mason.blacktar.canvas.controls.KeyboardControls;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
-import coffee.mason.blacktar.canvas.webgl.Mesh;
+import coffee.mason.blacktar.canvas.webgl.ObjStatic;
 import coffee.mason.blacktar.linear.Mat4x4;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
@@ -23,14 +23,20 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 			"# version 300 es",
 			"precision mediump float;",
 			"layout (location=0) in vec3 triPosition;",
+			"layout (location=1) in vec3 triNormal;",
 			"out vec3 triColor;",
 			"uniform mat4 mProj;",
 			"uniform mat4 mView;",
 			"uniform mat4 mWorld;",
+			"uniform float time;",
 			"void main()",
 			"{",
-				"triColor = vec3(triPosition.x + 0.2, triPosition.y + 0.1, triPosition.z + 0.4);",
-				"gl_Position = mProj * mView * mWorld * vec4(triPosition.x, triPosition.y, triPosition.z - float(gl_InstanceID)*3.0, 1.0);",
+			    "vec3 ambientColor = vec3(0.7, 0.7, 0.7);",
+			    "float ambientIntensity = max(dot(triNormal, vec3(0.0, 1.0, 0.0)), 0.0);", // Lambertian reflection model
+			    "vec3 ambient = ambientColor * ambientIntensity;",
+			    "vec3 rColor = vec3(min(tan(float(gl_InstanceID)), 0.2), min(cos(float(gl_InstanceID)), 0.3), min(sin(float(gl_InstanceID)), 0.2));",
+			    "triColor = vec3(0.1, 0.1, 0.1) + ambient + rColor;",
+				"gl_Position = mProj * mView * mWorld * vec4(triPosition.x + cos(float(gl_InstanceID)*time), triPosition.y, triPosition.z - float(gl_InstanceID)*5.0, 1.0);",
 			"}"
 	};
 	
@@ -59,6 +65,8 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 	private int projUniformLocation;
 	private int viewUniformLocation;
 	private int worldUniformLocation;
+	
+	private int timeUniformLocation;
 
 	private FpsKeyboardControls keyboardControls;
 	
@@ -69,7 +77,7 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 //		KeyboardControls.register(this);
 
 
-		world = (Float32Array) Float32Array.create(16);
+		world = Float32Array.create(16);
 //		view = (Float32Array) Float32Array.create(16);
 //		view = Mat4x4.identity();
 		identity = Mat4x4.identity();
@@ -77,6 +85,18 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 		setupShader();
 		
 		keyboardControls = new FpsKeyboardControls(gl, viewUniformLocation);
+		keyboardControls.getCamera().setPitch(-16f);
+		keyboardControls.getCamera().setYaw(272.4f);
+		keyboardControls.getCamera().setPosX(0.45f);
+		keyboardControls.getCamera().setPosY(7.5f);
+		keyboardControls.getCamera().setPosZ(12f);
+		keyboardControls.getCamera().updateViewDirection();
+		gl.uniformMatrix4fv(viewUniformLocation, false, keyboardControls.getCamera().getViewMatrix().getArray());
+		
+//		position = new Vec3(0.45f, 7.50f, 12f);
+//		yaw = 272.4f;
+//		pitch = -16f;
+//		viewDirection = new Vec3(0.04f, -0.28f, -0.96f);
 	}
 
 	private void setupShader() {
@@ -127,7 +147,7 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 			System.err.println("Link error with program.");
 		}
 
-		Float32Array array = Mesh.CUBE;
+		Float32Array array = ObjStatic.TEAPOT.getTriangleFloats();
 
 		JSObject floatBuffer = gl.createBuffer();
 
@@ -141,16 +161,47 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 
 		// Setting up attrib
 		// index, size (# of elements per attrib), type, normalized, stride, offset
-		gl.vertexAttribPointer(triPositionAttrib, 3, GL.FLOAT, false, 3 * 4, 0);
+		gl.vertexAttribPointer(triPositionAttrib, 3, GL.FLOAT, false, 3* 4, 0);
 		gl.enableVertexAttribArray(triPositionAttrib);
 
-		// TODO: Create normals
+		// Normals
+		Float32Array normalArray = ObjStatic.TEAPOT.getNormalFloats();
 
-//		int triNormalAttrib = gl.getAttribLocation(program, "triNormal");
+		System.out.println(array.getLength() + " =? " + normalArray.getLength());
+		
+		// Create a new buffer for normals
+		JSObject normalBuffer = gl.createBuffer();
+
+		// Set as active buffer.
+		gl.bindBuffer(GL.ARRAY_BUFFER, normalBuffer);
+
+		// Put data in the active buffer for normals.
+		gl.bufferData(GL.ARRAY_BUFFER, normalArray, GL.STATIC_DRAW);
+
+		// Attribute index for normals
+		int triNormalAttrib = 1;
+
+		// Setting up the attribute for normals
+		// the 3 * 4 offset is used to allow 3 vertices to access the same normal
+		gl.vertexAttribPointer(triNormalAttrib, 3, GL.FLOAT, false, (3) * 4, 0);
+		gl.enableVertexAttribArray(triNormalAttrib);
+		
+		
+//		Float32Array array1 = ObjStatic.TEAPOT.getNormalFloats();
+//
+//		JSObject floatBuffer1 = gl.createBuffer();
+//
+//		gl.bindBuffer(GL.ARRAY_BUFFER, floatBuffer1);
+//
+//		gl.bufferData(GL.ARRAY_BUFFER, array1, GL.STATIC_DRAW);
 //		
-//		gl.vertexAttribPointer(triNormalAttrib, 1, GL.FLOAT, false, 3*4, 0);
+//		// TODO: Create normals
+//
+//		int triNormalAttrib = 1;
+//		
+//		gl.vertexAttribPointer(triNormalAttrib, 3, GL.FLOAT, false, 3*4, 4*ObjStatic.TEAPOT.getTriangleFloats().getLength());
 //		gl.enableVertexAttribArray(triNormalAttrib);
-
+		
 		JSObject colorBuffer = gl.createBuffer();
 
 		gl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer);
@@ -165,7 +216,10 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 		projUniformLocation = gl.getUniformLocation(program, "mProj");
 		viewUniformLocation = gl.getUniformLocation(program, "mView");
 		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
+		timeUniformLocation = gl.getUniformLocation(program, "time");
 
+		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/1000f);
+		
 //		view.setValue(2, 3, -3.5f);
 
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
@@ -218,6 +272,8 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 			onResize();
 		}
 		
+		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/10000f);
+		
 		keyboardControls.update();
 
 	}
@@ -229,7 +285,7 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 
 		
 //		gl.drawArrays(GL.TRIANGLES, 0, Mesh.CUBE.getLength()/3);
-		gl.drawArraysInstanced(GL.TRIANGLES, 0, Mesh.CUBE.getLength()/3, 100);
+		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 100);
 
 	}
 

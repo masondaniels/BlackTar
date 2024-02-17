@@ -10,12 +10,12 @@ public class Camera {
 	private Vec3 viewDirection;
 	private Vec3 forwardDirection;
 
-	private static Vec3 up = new Vec3();
+	public static Vec3 up = new Vec3();
 
 	static {
 		up.setValue(1, 1); // y is up
 	}
-	
+
 	public Camera() {
 		viewDirection = new Vec3(0, 0, -1f);
 		forwardDirection = viewDirection;
@@ -28,52 +28,51 @@ public class Camera {
 	public Vec3 getViewDirection() {
 		return viewDirection;
 	}
-	
+
 	public void moveForward(float distance) {
 		position = (Vec3) position.add(forwardDirection.scale(distance));
 	}
-	
+
 	public void moveBackwards(float distance) {
 		position = (Vec3) position.sub(forwardDirection.scale(distance));
 	}
-	
+
 	public void strafeLeft(float distance) {
 		Vec3 strafeDirection = Vec3.cross(forwardDirection, Camera.up);
 		position = (Vec3) position.add(strafeDirection.scale(distance));
 	}
-	
+
 	public void strafeRight(float distance) {
 		Vec3 strafeDirection = Vec3.cross(forwardDirection, Camera.up);
 		position = (Vec3) position.sub(strafeDirection.scale(distance));
 	}
-	
+
 	public void moveUp(float distance) {
 		position = (Vec3) position.add(Camera.up.scale(distance));
 	}
-	
+
 	public void moveDown(float distance) {
 		position = (Vec3) position.sub(Camera.up.scale(distance));
 	}
-	
+
 	private float yaw; // deg
 	private float pitch; // deg
 
 	public void updateViewDirection() {
-	    // Convert yaw and pitch to radians
-	    float yawRad = (float) Math.toRadians(yaw);
-	    float pitchRad = (float) Math.toRadians(pitch);
+		// Convert yaw and pitch to radians
+		float yawRad = (float) Math.toRadians(yaw);
+		float pitchRad = (float) Math.toRadians(pitch);
 
-	    // Calculate the new view direction using spherical coordinates
-	    float x = (float) (Math.cos(yawRad) * Math.cos(pitchRad));
-	    float y = (float) (Math.sin(pitchRad));
-	    float z = (float) (Math.sin(yawRad) * Math.cos(pitchRad));
+		// Calculate the new view direction using spherical coordinates
+		float x = (float) (Math.cos(yawRad) * Math.cos(pitchRad));
+		float y = (float) (Math.sin(pitchRad));
+		float z = (float) (Math.sin(yawRad) * Math.cos(pitchRad));
 
-	    // Update the view direction
-	    viewDirection = new Vec3(x, y, z).normalize();
-	    forwardDirection = viewDirection.remove(Camera.up).normalize();
+		// Update the view direction
+		viewDirection = new Vec3(x, y, z).normalize();
+		forwardDirection = viewDirection.remove(Camera.up).normalize();
 	}
 
-	
 	public Mat4x4 getViewMatrix() {
 		// Using lookingAt and position, return new view matrix
 		Vec3 forward = Vec3.normalize((Vec3) viewDirection);
@@ -83,24 +82,22 @@ public class Camera {
 		Mat4x4 viewMatrix = new Mat4x4();
 		viewMatrix.setValue(0, 0, right.getValue(0)); // right.x
 		viewMatrix.setValue(1, 0, up.getValue(0)); // up.x
-		viewMatrix.setValue(2, 0, -1*(forward.getValue(0))); // forward.x
+		viewMatrix.setValue(2, 0, -1 * (forward.getValue(0))); // forward.x
 
 		viewMatrix.setValue(0, 1, right.getValue(1)); // right.y
 		viewMatrix.setValue(1, 1, up.getValue(1)); // up.y
-		viewMatrix.setValue(2, 1, -1*(forward.getValue(1))); // forward.y
+		viewMatrix.setValue(2, 1, -1 * (forward.getValue(1))); // forward.y
 
 		viewMatrix.setValue(0, 2, right.getValue(2)); // right.z
 		viewMatrix.setValue(1, 2, up.getValue(2)); // up.z
-		viewMatrix.setValue(2, 2, -1*(forward.getValue(2))); // forward.z
+		viewMatrix.setValue(2, 2, -1 * (forward.getValue(2))); // forward.z
 
-		
-
-		viewMatrix.setValue(0, 3, -1*Vec3.dot(right, position));
-		viewMatrix.setValue(1, 3, -1*Vec3.dot(up, position));
+		viewMatrix.setValue(0, 3, -1 * Vec3.dot(right, position));
+		viewMatrix.setValue(1, 3, -1 * Vec3.dot(up, position));
 		viewMatrix.setValue(2, 3, Vec3.dot(forward, position));
-		
+
 		viewMatrix.setValue(3, 3, 1); // w
-		
+
 		System.out.println("View matrix:\n" + viewMatrix);
 
 		return viewMatrix;
@@ -136,7 +133,7 @@ public class Camera {
 	}
 
 	public void setYaw(float yaw) {
-	    this.yaw = (yaw % 360 + 360) % 360;
+		this.yaw = (yaw % 360 + 360) % 360;
 	}
 
 	public float getPitch() {
@@ -144,7 +141,7 @@ public class Camera {
 	}
 
 	public void setPitch(float pitch) {
-		 this.pitch = Math.max(-90, Math.min(90, pitch));
+		this.pitch = Math.max(-90, Math.min(90, pitch));
 	}
 
 	public void setViewDirection(Vec3 viewDirection) {

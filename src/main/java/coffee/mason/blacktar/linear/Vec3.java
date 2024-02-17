@@ -1,5 +1,9 @@
 package coffee.mason.blacktar.linear;
 
+import org.teavm.jso.JSObject;
+
+import coffee.mason.blacktar.util.Float32ArrayUtil;
+
 public class Vec3 extends VecN {
 
 	public Vec3(float x, float y, float z) {
@@ -60,6 +64,18 @@ public class Vec3 extends VecN {
 	public Vec3 remove(Vec3 normalizedRemove) {
 		return new Vec3(getValue(0) * (1 - normalizedRemove.getValue(0)),
 				getValue(1) * (1 - normalizedRemove.getValue(1)), getValue(2) * (1 - normalizedRemove.getValue(2)));
+	}
+
+	public Vec3 cross(Vec3 other) {
+		return Vec3.cross(this, other);
+	}
+
+	public JSObject toFloat32Array() {
+		return Float32ArrayUtil.of(getValue(0), getValue(1), getValue(2));
+	}
+
+	public Vec3 inverse() {
+		return new Vec3(-1f*this.getValue(0), -1f*this.getValue(1), -1f*this.getValue(2));
 	}
 
 }

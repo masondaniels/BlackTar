@@ -5,7 +5,6 @@ import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 
-import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.component.Updatable;
 import coffee.mason.blacktar.util.RandomUtil;
 

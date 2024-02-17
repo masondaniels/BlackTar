@@ -50,7 +50,8 @@ public class Testing {
 				getCtx().fillText("L = (" + JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(0), 2) + ","
 						+ JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(1), 2) + ","
 						+ JavaScriptUtil.numToFixed(camera.getViewDirection().getValue(2), 2) + ")", 10, 44);
-				
+				getCtx().fillText("Yaw = (" + JavaScriptUtil.numToFixed(camera.getYaw(), 2) + ")", 10, 56);
+				getCtx().fillText("Pitch = (" + JavaScriptUtil.numToFixed(camera.getPitch(), 2) + ")", 10, 68);
 				// getRefreshCount(), getHeight() looked weird
 			}
 		};

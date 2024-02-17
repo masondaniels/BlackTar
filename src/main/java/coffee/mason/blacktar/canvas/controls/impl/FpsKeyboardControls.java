@@ -48,7 +48,7 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 	}
 
 	private float speed = 0.3f;
-	private float angleSpeed = 1.5f;
+	private float angleSpeed = 0.8f;
 
 	private boolean movedPosition;
 	private boolean movedEye;
