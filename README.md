@@ -16,14 +16,8 @@ Black Tar is a Java TeaVM library with WebGL bindings. Its primary purpose is to
 
 ## Visual
 
-https://files.catbox.moe/sly62s.webm
+![](https://i.imgur.com/FkZlNjJ.png)
 
-Rotating cube.
+![](https://files.catbox.moe/sly62s.webm)
 
 ![](https://i.imgur.com/FzbDDFd.gif)
-
-The engine currently renders a triangle at (0, 0.5, 0), (-0.5, -0.5, 0), (0.5, -0.5, 0) rotated about the x and z axis by a factor of 2 and 1 respectively.
-
-The camera is at position (0, 0, -2) facing the z axis head on.
-
-The engine can effectively render anything in 3d space now. 
