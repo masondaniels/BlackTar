@@ -101,12 +101,12 @@ public class MCPETouchControls implements TouchControls, Updatable {
 
 		if (touching) {
 			if (!(xLast == -1 && yLast == -1)) {
-				float xD = (me.getClientX() - xLast);
-				float yD = (me.getClientY() - yLast);
+				float xD = (me.getClientX() - xLast)/2f;
+				float yD = (me.getClientY() - yLast)/2f;
 
-				Vec3 n = new Vec3(xD, yD, 0f).normalize();
-				camera.setYaw(camera.getYaw() - n.getValue(0)); // xD
-				camera.setPitch(camera.getPitch() - n.getValue(1)); // yD
+//				Vec3 n = new Vec3(xD, yD, 0f).normalize();
+				camera.setYaw(camera.getYaw() - xD*1.4f); // xD
+				camera.setPitch(camera.getPitch() - yD*1.2f); // yD
 				updateCamera();
 
 				// calculate delta
@@ -121,18 +121,24 @@ public class MCPETouchControls implements TouchControls, Updatable {
 	public void handleTouchEnd(Event e) {
 		MouseEvent me = (MouseEvent) e;
 		touching = false;
+		xLast = -1;
+		yLast = -1;
 	}
 
 	@Override
 	public void handleTouchCancel(Event e) {
 		MouseEvent me = (MouseEvent) e;
 		touching = false;
+		xLast = -1;
+		yLast = -1;
 	}
 
 	@Override
 	public void handleTouchOut(Event e) {
 		MouseEvent me = (MouseEvent) e;
 		touching = false;
+		xLast = -1;
+		yLast = -1;
 	}
 
 	@Override

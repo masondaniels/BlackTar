@@ -15,6 +15,12 @@ public interface TouchMethodsInterface {
 		System.out.println("Registered Touch Events");
 		element.getStyle().setProperty("touch-action", "none"); // Cancels early touchcancel firing.
 		element.getStyle().setProperty("user-select", "none"); // no copy text!!!
+		element.getStyle().setProperty("-webkit-touch-callout", "none");
+		element.getStyle().setProperty("-webkit-user-select", "none");
+		element.getStyle().setProperty("-khtml-user-select", "none");
+		element.getStyle().setProperty("-moz-user-select", "none");
+		element.getStyle().setProperty("-ms-user-select", "none");
+		element.getStyle().setProperty("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
 		
 		
 		element.addEventListener("pointerdown", (e) -> {
