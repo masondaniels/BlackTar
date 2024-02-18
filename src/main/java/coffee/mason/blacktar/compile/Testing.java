@@ -1,8 +1,8 @@
 package coffee.mason.blacktar.compile;
 
 import coffee.mason.blacktar.canvas.Canvas2D;
+import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
-import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 
@@ -40,7 +40,7 @@ public class Testing {
 				getCtx().clearRect(0, 0, getWidth(), 100);
 				getCtx().setFillStyle("white");
 
-				Camera camera = ((FpsKeyboardControls) glImpl.getKeyboardControls()).getCamera();
+				Camera camera = glImpl.getCamera();
 
 				String x = JavaScriptUtil.numToFixed(camera.getPosX(), 2);
 				String y = JavaScriptUtil.numToFixed(camera.getPosY(), 2);
@@ -57,6 +57,8 @@ public class Testing {
 		};
 		glImpl.setZIndex(1);
 		ui.setZIndex(2);
+		
+		TouchControls.register(glImpl.getTouchControls(), ui);
 	}
 
 }

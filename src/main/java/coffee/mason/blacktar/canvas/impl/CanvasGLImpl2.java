@@ -8,16 +8,17 @@ import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.typedarrays.Float32Array;
 
 import coffee.mason.blacktar.canvas.CanvasGL2;
-import coffee.mason.blacktar.canvas.controls.KeyboardControls;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
+import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
+import coffee.mason.blacktar.canvas.controls.impl.MCPETouchControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
 import coffee.mason.blacktar.linear.Mat4x4;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
 
-public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
+public class CanvasGLImpl2 extends CanvasGL2 {
 
 	private static final String[] VERTEX = {
 			"# version 300 es",
@@ -57,9 +58,7 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 
 	private Mat4x4 proj;
 	private Float32Array world;
-//	private Float32Array view;
-//	private Mat4x4 view;
-
+	
 	private Mat4x4 identity;
 
 	private int projUniformLocation;
@@ -68,37 +67,40 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 	
 	private int timeUniformLocation;
 
+	private Camera camera;
 	private FpsKeyboardControls keyboardControls;
+	
+	private MCPETouchControls touchControls;
 	
 	@Override
 	public void loadBeforeAnimation() {
 
-		TouchControls.register(this, this);
-//		KeyboardControls.register(this);
-
-
 		world = Float32Array.create(16);
-//		view = (Float32Array) Float32Array.create(16);
-//		view = Mat4x4.identity();
+
 		identity = Mat4x4.identity();
 
 		setupShader();
 		
-		keyboardControls = new FpsKeyboardControls(gl, viewUniformLocation);
-		keyboardControls.getCamera().setPitch(-16f);
-		keyboardControls.getCamera().setYaw(272.4f);
-		keyboardControls.getCamera().setPosX(0.45f);
-		keyboardControls.getCamera().setPosY(7.5f);
-		keyboardControls.getCamera().setPosZ(12f);
-		keyboardControls.getCamera().updateViewDirection();
-		gl.uniformMatrix4fv(viewUniformLocation, false, keyboardControls.getCamera().getViewMatrix().getArray());
+		camera = new Camera();
 		
-//		position = new Vec3(0.45f, 7.50f, 12f);
-//		yaw = 272.4f;
-//		pitch = -16f;
-//		viewDirection = new Vec3(0.04f, -0.28f, -0.96f);
+		keyboardControls = new FpsKeyboardControls(camera, gl, viewUniformLocation);
+		camera.setPitch(-16f);
+		camera.setYaw(272.4f);
+		camera.setPosX(0.45f);
+		camera.setPosY(7.5f);
+		camera.setPosZ(12f);
+		camera.updateViewDirection();
+		
+		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
+		
+		touchControls = new MCPETouchControls(gl, camera, viewUniformLocation);
+		
+		
+
 	}
 
+	// TODO: Abstract gl stuff. Make adding uniforms and attribs easier.
+	
 	private void setupShader() {
 
 		JSObject vertexShader = gl.createShader(GL.VERTEX_SHADER);
@@ -275,7 +277,8 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/10000f);
 		
 		keyboardControls.update();
-
+		touchControls.update();
+		
 	}
 
 	@Override
@@ -294,45 +297,12 @@ public class CanvasGLImpl2 extends CanvasGL2 implements TouchControls {
 		onResize();
 	}
 
-	private boolean isTouched; // is screen touched?
-
-	@Override
-	public void handleTouchStart(Event e) {
-		System.out.println("Touch start");
-		isTouched = true;
+	public Camera getCamera() {
+		return camera;
 	}
-
-	@Override
-	public void handleTouchMove(Event e) {
-		MouseEvent me = (MouseEvent) e;
-		if (isTouched) {
-			System.out.println("Touch move " + me.getClientX() + ", " + me.getClientY());
-
-		}
-	}
-
-	@Override
-	public void handleTouchEnd(Event e) {
-		isTouched = false;
-		System.out.println("Touch end");
-	}
-
-	@Override
-	public void handleTouchCancel(Event e) {
-		isTouched = false;
-		System.out.println("Touch cancel");
-
-	}
-
-	@Override
-	public void handleTouchOut(Event e) {
-		isTouched = false;
-		System.out.println("Touch out");
-	}
-
-
-	public KeyboardControls getKeyboardControls() {
-		return keyboardControls;
+	
+	public TouchControls getTouchControls() {
+		return touchControls;
 	}
 
 }

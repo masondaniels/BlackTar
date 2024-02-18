@@ -14,15 +14,12 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 	private WebGLContext gl;
 	private int viewUniformLocation;
 
-	private Camera camera = new Camera();
+	private Camera camera;
 
-	public FpsKeyboardControls(WebGLContext gl, int viewUniformLocation) {
+	public FpsKeyboardControls(Camera camera, WebGLContext gl, int viewUniformLocation) {
 		this.gl = gl;
 		this.viewUniformLocation = viewUniformLocation;
-		camera.setPosZ(3f);
-		camera.setYaw(-90f);
-		camera.updateViewDirection();
-		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
+		this.camera = camera;
 		KeyboardControls.register(this);
 	}
 
@@ -114,10 +111,6 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 				movedEye = false;
 			}
 		}
-	}
-
-	public Camera getCamera() {
-		return camera;
 	}
 	
 }

@@ -3,13 +3,8 @@ package coffee.mason.blacktar.canvas.controls;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.events.Event;
 
-public abstract interface KeyboardControls {
+public abstract interface KeyboardControls extends KeyControls {
 
-	
-	public abstract void handleKeyDown(Event e);
-	public abstract void handleKeyUp(Event e);
-	public abstract void handleKeyPress(Event e);
-	
 	public static void register(KeyboardControls controls) {
 		System.out.println("Registered Keyboard Events");
 		// Key down and key up are for ctrl keys such as shift.
@@ -23,5 +18,5 @@ public abstract interface KeyboardControls {
 			controls.handleKeyPress(e);
 		}, false);
 	}
-	
+
 }
