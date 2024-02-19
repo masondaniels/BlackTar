@@ -1,7 +1,5 @@
 package coffee.mason.blacktar.canvas.impl;
 
-import org.teavm.jso.typedarrays.Float32Array;
-
 import coffee.mason.blacktar.canvas.CanvasGL2;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
@@ -23,7 +21,6 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 			"out vec3 triColor;",
 			"uniform mat4 mProj;",
 			"uniform mat4 mView;",
-			"uniform mat4 mWorld;",
 			"uniform float time;",
 			"void main()",
 			"{",
@@ -32,7 +29,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 			    "vec3 ambient = ambientColor * ambientIntensity;",
 			    "vec3 rColor = vec3(min(tan(float(gl_InstanceID)), 0.2), min(cos(float(gl_InstanceID)), 0.3), min(sin(float(gl_InstanceID)), 0.2));",
 			    "triColor = vec3(0.1, 0.1, 0.1) + ambient + rColor;",
-				"gl_Position = mProj * mView * mWorld * vec4(triPosition.x + cos(float(gl_InstanceID)*time), triPosition.y, triPosition.z - float(gl_InstanceID)*5.0, 1.0);",
+			    "gl_Position = mProj * mView * vec4(triPosition.x + cos(float(gl_InstanceID)*time), triPosition.y, triPosition.z - float(gl_InstanceID)*5.0, 1.0);",
 			"}"
 	};
 	
@@ -52,13 +49,9 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	}
 
 	private Mat4x4 proj;
-	private Float32Array world;
-	
-	private Mat4x4 identity;
 
 	private int projUniformLocation;
 	private int viewUniformLocation;
-	private int worldUniformLocation;
 	
 	private int timeUniformLocation;
 
@@ -69,16 +62,11 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	
 	@Override
 	public void loadBeforeAnimation() {
-
-		world = Float32Array.create(16);
-		identity = Mat4x4.identity();
-
+		
 		setupShader();
 		
 		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/1000f);
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		world = identity.getArray();
-		uniformMatrix4fv();
 		
 		camera = new Camera();
 		
@@ -90,7 +78,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		camera.setPosZ(12f);
 		camera.updateViewDirection();
 		
-		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
+		uniformMatrix4fv();
 		
 		touchControls = new MCPETouchControls(gl, camera, viewUniformLocation);
 
@@ -113,14 +101,13 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 
 		projUniformLocation = shader.getUniformLocation("mProj");
 		viewUniformLocation = shader.getUniformLocation("mView");
-		worldUniformLocation = shader.getUniformLocation("mWorld");
 		timeUniformLocation = shader.getUniformLocation("time");
 		
 	}
 
 	private void uniformMatrix4fv() {
 		gl.uniformMatrix4fv(projUniformLocation, false, proj.getArray());
-		gl.uniformMatrix4fv(worldUniformLocation, false, world);
+		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
 	}
 
 	@Override
@@ -159,7 +146,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	public Camera getCamera() {
 		return camera;
 	}
-	
+
 	public TouchControls getTouchControls() {
 		return touchControls;
 	}
