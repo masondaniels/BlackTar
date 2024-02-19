@@ -15,7 +15,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 
 	private static final String[] VERTEX = {
 			"# version 300 es",
-			"precision mediump float;",
+			"precision highp float;",
 			"layout (location=0) in vec3 triPosition;",
 			"layout (location=1) in vec3 triNormal;",
 			"out vec3 triColor;",
@@ -35,7 +35,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	
 	private static final String[] FRAG = {
 			"# version 300 es",
-			"precision mediump float;",
+			"precision highp float;",
 			"in vec3 triColor;",
 			"out vec4 fragCoord;",
 			"void main()",
