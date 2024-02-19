@@ -1,10 +1,5 @@
 package coffee.mason.blacktar.canvas.impl;
 
-import org.teavm.jso.JSObject;
-import org.teavm.jso.browser.Window;
-import org.teavm.jso.core.JSNumber;
-import org.teavm.jso.dom.events.Event;
-import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.typedarrays.Float32Array;
 
 import coffee.mason.blacktar.canvas.CanvasGL2;
@@ -14,9 +9,9 @@ import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.controls.impl.MCPETouchControls;
 import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
+import coffee.mason.blacktar.canvas.webgl.Shader;
 import coffee.mason.blacktar.linear.Mat4x4;
 import coffee.mason.blacktar.util.JavaScriptUtil;
-import coffee.mason.blacktar.util.StringUtil;
 
 public class CanvasGLImpl2 extends CanvasGL2 {
 
@@ -76,10 +71,14 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	public void loadBeforeAnimation() {
 
 		world = Float32Array.create(16);
-
 		identity = Mat4x4.identity();
 
 		setupShader();
+		
+		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/1000f);
+		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
+		world = identity.getArray();
+		uniformMatrix4fv();
 		
 		camera = new Camera();
 		
@@ -94,142 +93,29 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
 		
 		touchControls = new MCPETouchControls(gl, camera, viewUniformLocation);
-		
-		
 
 	}
 
-	// TODO: Abstract gl stuff. Make adding uniforms and attribs easier.
+	private Shader shader;
 	
 	private void setupShader() {
 
-		JSObject vertexShader = gl.createShader(GL.VERTEX_SHADER);
-		JSObject fragShader = gl.createShader(GL.FRAGMENT_SHADER);
-
-		gl.shaderSource(vertexShader, StringUtil.join("\n", VERTEX));
-		gl.shaderSource(fragShader, StringUtil.join("\n", FRAG));
-
-		gl.compileShader(vertexShader);
-		gl.compileShader(fragShader);
-
-		// Compiling error checks - fragment
-		JSObject compileStatusFrag = gl.getShaderParameter(fragShader, GL.COMPILE_STATUS);
-		if (!JavaScriptUtil.not(compileStatusFrag)) {
-			System.err.println("Compiling error with fragment shader.");
-			System.err.println(gl.getShaderInfoLog(fragShader) + "");
-		}
-
-		// Compiling error checks - vertex
-		JSObject compileStatusVertex = gl.getShaderParameter(vertexShader, GL.COMPILE_STATUS);
-		if (!JavaScriptUtil.not(compileStatusVertex)) {
-			System.err.println("Compiling error with vertex shader.");
-			System.err.println(gl.getShaderInfoLog(vertexShader) + "");
-		}
-
-		// Need to create graphics program (graphics pipeline)
-		JSObject program = gl.createProgram();
-
-		gl.attachShader(program, vertexShader);
-		gl.attachShader(program, fragShader);
-
-		// Link program
-		gl.linkProgram(program);
-
-		// Validate program (very important, literally spent an hour or two debugging
-		// because I missed this)
-		gl.validateProgram(program);
-
-		JSObject programValidStatus = gl.getProgramParameter(program, GL.VALIDATE_STATUS);
-		if (!JavaScriptUtil.not(programValidStatus)) {
-			System.err.println("Validate status error with program.");
-		}
-
-		JSObject programLinkStatus = gl.getProgramParameter(program, GL.LINK_STATUS);
-		if (!JavaScriptUtil.not(programLinkStatus)) {
-			System.err.println("Link error with program.");
-		}
-
-		Float32Array array = ObjStatic.TEAPOT.getTriangleFloats();
-
-		JSObject floatBuffer = gl.createBuffer();
-
-		// Set as active buffer.
-		gl.bindBuffer(GL.ARRAY_BUFFER, floatBuffer);
-
-		// Put data in active buffer.
-		gl.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
-
-		int triPositionAttrib = 0; //  gl.getAttribLocation(program, "triPosition");
-
-		// Setting up attrib
-		// index, size (# of elements per attrib), type, normalized, stride, offset
-		gl.vertexAttribPointer(triPositionAttrib, 3, GL.FLOAT, false, 3* 4, 0);
-		gl.enableVertexAttribArray(triPositionAttrib);
-
-		// Normals
-		Float32Array normalArray = ObjStatic.TEAPOT.getNormalFloats();
-
-		System.out.println(array.getLength() + " =? " + normalArray.getLength());
+		shader = new Shader(gl, VERTEX, FRAG);
+		shader.useProgram();
 		
-		// Create a new buffer for normals
-		JSObject normalBuffer = gl.createBuffer();
-
-		// Set as active buffer.
-		gl.bindBuffer(GL.ARRAY_BUFFER, normalBuffer);
-
-		// Put data in the active buffer for normals.
-		gl.bufferData(GL.ARRAY_BUFFER, normalArray, GL.STATIC_DRAW);
-
-		// Attribute index for normals
-		int triNormalAttrib = 1;
-
-		// Setting up the attribute for normals
-		// the 3 * 4 offset is used to allow 3 vertices to access the same normal
-		gl.vertexAttribPointer(triNormalAttrib, 3, GL.FLOAT, false, (3) * 4, 0);
-		gl.enableVertexAttribArray(triNormalAttrib);
-		
-		
-//		Float32Array array1 = ObjStatic.TEAPOT.getNormalFloats();
-//
-//		JSObject floatBuffer1 = gl.createBuffer();
-//
-//		gl.bindBuffer(GL.ARRAY_BUFFER, floatBuffer1);
-//
-//		gl.bufferData(GL.ARRAY_BUFFER, array1, GL.STATIC_DRAW);
-//		
-//		// TODO: Create normals
-//
-//		int triNormalAttrib = 1;
-//		
-//		gl.vertexAttribPointer(triNormalAttrib, 3, GL.FLOAT, false, 3*4, 4*ObjStatic.TEAPOT.getTriangleFloats().getLength());
-//		gl.enableVertexAttribArray(triNormalAttrib);
-		
-		JSObject colorBuffer = gl.createBuffer();
-
-		gl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer);
-
-		gl.useProgram(program);
+		shader.createFloatAttrib(0, 3, ObjStatic.TEAPOT.getTriangleFloats());
+		shader.createFloatAttrib(1, 3, ObjStatic.TEAPOT.getNormalFloats());
 
 		// Enable depth testing & culling
 		gl.frontFace(GL.CCW);
 		gl.cullFace(GL.BACK);
 		gl.enable(GL.DEPTH_TEST);
 
-		projUniformLocation = gl.getUniformLocation(program, "mProj");
-		viewUniformLocation = gl.getUniformLocation(program, "mView");
-		worldUniformLocation = gl.getUniformLocation(program, "mWorld");
-		timeUniformLocation = gl.getUniformLocation(program, "time");
-
-		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/1000f);
+		projUniformLocation = shader.getUniformLocation("mProj");
+		viewUniformLocation = shader.getUniformLocation("mView");
+		worldUniformLocation = shader.getUniformLocation("mWorld");
+		timeUniformLocation = shader.getUniformLocation("time");
 		
-//		view.setValue(2, 3, -3.5f);
-
-		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-
-		world = identity.getArray();
-
-		uniformMatrix4fv();
-
 	}
 
 	private void uniformMatrix4fv() {
@@ -241,44 +127,19 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	public void loadAfterAnimation() {
 
 	}
-
-	private double dpi = -1;
-
+	
 	private void onResize() {
-		if (dpi == -1) {
-			dpi = ((JSNumber) JavaScriptUtil.eval("window.devicePixelRatio || 1")).doubleValue();
-		}
-
-		if (isFullscreen()) {
-			canvas.setWidth((int) (Window.current().getInnerWidth() * dpi));
-			canvas.setHeight((int) (Window.current().getInnerHeight() * dpi));
-			setWidth(Window.current().getInnerWidth() * dpi);
-			setHeight(Window.current().getInnerHeight() * dpi);
-			canvas.getStyle().setProperty("width", Window.current().getInnerWidth() + "px");
-			canvas.getStyle().setProperty("height", Window.current().getInnerHeight() + "px");
-		}
-
 		gl.viewport(0, 0, (float) getWidth(), (float) getHeight());
-
 		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-
 		uniformMatrix4fv();
-
 		System.out.println("Updated projection matrix:\n" + proj.toString());
 	}
 
 	@Override
 	public void update() {
-		// Resize if init
-		if (dpi == -1) {
-			onResize();
-		}
-		
 		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/10000f);
-		
 		keyboardControls.update();
 		touchControls.update();
-		
 	}
 
 	@Override
@@ -286,9 +147,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		gl.clearColor(0f, 0f, 0f, 1f);
 		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-		
-//		gl.drawArrays(GL.TRIANGLES, 0, Mesh.CUBE.getLength()/3);
-		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 100);
+		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 50);
 
 	}
 

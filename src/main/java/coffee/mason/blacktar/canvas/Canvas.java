@@ -2,10 +2,12 @@ package coffee.mason.blacktar.canvas;
 
 import org.teavm.jso.JSObject;
 import org.teavm.jso.browser.Window;
+import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 
 import coffee.mason.blacktar.component.Updatable;
+import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.RandomUtil;
 
 public abstract class Canvas implements Updatable {
@@ -46,6 +48,9 @@ public abstract class Canvas implements Updatable {
 			} else {
 				fps++;
 			}
+			if (dpi == -1) {
+				onDPI();
+			}
 			update();
 			draw();
 			requestAnimationFrame();
@@ -60,6 +65,7 @@ public abstract class Canvas implements Updatable {
 			setWidth(Window.current().getInnerWidth());
 			setHeight(Window.current().getInnerHeight());
 		}
+		onDPI();
 		onCanvasResize(); // Calls special methods (in implemented classes) on canvas resize if there are
 							// any
 		draw();
@@ -76,6 +82,27 @@ public abstract class Canvas implements Updatable {
 	public abstract void draw();
 
 	public abstract void onCanvasResize();
+	
+	private double dpi = -1;
+	
+	public double getDPI() {
+		return dpi;
+	}
+	
+	private void onDPI() {
+		if (dpi == -1) {
+			dpi = ((JSNumber) JavaScriptUtil.eval("window.devicePixelRatio || 1")).doubleValue();
+		}
+
+		if (isFullscreen()) {
+			canvas.setWidth((int) (Window.current().getInnerWidth() * dpi));
+			canvas.setHeight((int) (Window.current().getInnerHeight() * dpi));
+			setWidth(Window.current().getInnerWidth() * dpi);
+			setHeight(Window.current().getInnerHeight() * dpi);
+			canvas.getStyle().setProperty("width", Window.current().getInnerWidth() + "px");
+			canvas.getStyle().setProperty("height", Window.current().getInnerHeight() + "px");
+		}
+	}
 
 	public double getWidth() {
 		return width;
