@@ -1,14 +1,40 @@
 package coffee.mason.blacktar.compile;
 
+import org.teavm.interop.AsyncCallback;
 import coffee.mason.blacktar.canvas.Canvas2D;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
+import coffee.mason.blacktar.canvas.webgl.Obj;
+import coffee.mason.blacktar.canvas.webgl.ObjStatic;
+import coffee.mason.blacktar.util.AjaxUtil;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 
 public class Testing {
 
+
+
 	public static void main(String[] args) {
+		
+		AjaxUtil.get("teapot.obj", new AsyncCallback<String>() {
+			
+			@Override
+			public void error(Throwable e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void complete(String result) {
+				ObjStatic.TEAPOT = new Obj(result.split("\n"));
+				ObjStatic.TEAPOT.computeNormals(Camera.up);
+				init();
+			}
+		});
+		
+	}
+	
+	private static void init() {
 		CanvasGLImpl2 glImpl = new CanvasGLImpl2(true);
 		Canvas2D ui = new Canvas2D(true) {
 

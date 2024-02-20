@@ -1,11 +1,8 @@
 package coffee.mason.blacktar.canvas.webgl;
 
 import java.util.Arrays;
-import java.util.Iterator;
-
 import org.teavm.jso.typedarrays.Float32Array;
 
-import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.linear.Vec3;
 import coffee.mason.blacktar.util.Float32ArrayUtil;
 
@@ -101,6 +98,7 @@ public class Obj {
 		}
 
 		float[] trianglesTemp = new float[triangles.getLength()];
+		//TODO: Load normals
 		float[] normalsTemp = new float[triangles.getLength()];
 
 		fc = 0;

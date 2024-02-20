@@ -3,6 +3,8 @@ This folder contains special files which may be needed in compiling the cordova/
 
 When using apache cordova, make sure to add this to the config.xml:  
 
-
-
-``` <preference name="Fullscreen" value="true" /> ```
+``` 
+<preference name="Fullscreen" value="true" />
+<access origin="*" />
+<allow-navigation href="*"/>
+```
