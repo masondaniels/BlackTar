@@ -83,21 +83,20 @@ public class Mesh {
 
 	// TODO: Cache f32 array
 
-	private int generateUniformsIteratorIndex;
-
 	private UniformInformation[] generateUniforms(String positionName, int size, int start) {
 		float[] pos = new float[size * 3];
-		generateUniformsIteratorIndex = 0;
+		int generateUniformsIteratorIndex = 0;
 
 		Iterator<MeshInstance> itr = instances.iterator();
 
+		int relativeIndex = 0;
 		while (itr.hasNext()) {
 			if (generateUniformsIteratorIndex >= start) {
 				MeshInstance instance = itr.next();
-				int relativeIndex = generateUniformsIteratorIndex - start;
 				pos[relativeIndex * 3 + 0] = instance.getLocation().getValue(0);
 				pos[relativeIndex * 3 + 1] = instance.getLocation().getValue(1);
 				pos[relativeIndex * 3 + 2] = instance.getLocation().getValue(2);
+				relativeIndex++;
 			}
 
 			generateUniformsIteratorIndex++;
