@@ -1,7 +1,10 @@
 package coffee.mason.blacktar.canvas.webgl;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.teavm.jso.JSObject;
-import org.teavm.jso.typedarrays.Float32Array;
+import org.teavm.jso.core.JSNumber;
 
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.StringUtil;
@@ -10,6 +13,8 @@ public class Shader {
 
 	private WebGLContext gl;
 
+	private static WebGLContext glStatic; // only used for magic replace
+
 	private String vertSource;
 	private String fragSource;
 
@@ -17,9 +22,44 @@ public class Shader {
 
 	public Shader(WebGLContext gl, String[] vertSource, String[] fragSource) {
 		this.gl = gl;
+		Shader.glStatic = gl; // bad but whatever
 		this.vertSource = StringUtil.join("\n", vertSource);
 		this.fragSource = StringUtil.join("\n", fragSource);
+
+		this.vertSource = replaceSourceWithMagic(this.vertSource);
+		this.fragSource = replaceSourceWithMagic(this.fragSource);
+
 		createShaderProgram();
+	}
+
+	private static Pattern magic;
+
+	static {
+		String regex = "(.*?)`(.*?)`";
+		magic = Pattern.compile(regex);
+	}
+
+	public static String replaceSourceWithMagic(String source) {
+		Matcher matcher = magic.matcher(source);
+		StringBuffer sb = new StringBuffer();
+
+		while (matcher.find()) {
+			int replacement = processMagicReplacement(matcher.group(2));
+			matcher.appendReplacement(sb, "$1" + replacement);
+		}
+		
+		matcher.appendTail(sb);
+
+		System.out.println(sb.toString());
+
+		return sb.toString();
+	}
+
+	private static int processMagicReplacement(String content) {
+
+		int value = Integer.parseInt(content);
+
+		return ((JSNumber) glStatic.getParameter(value)).intValue();
 	}
 
 	private void createShaderProgram() {

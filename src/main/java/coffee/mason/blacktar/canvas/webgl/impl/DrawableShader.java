@@ -15,7 +15,7 @@ public class DrawableShader extends Shader {
 			"uniform mat4 mProj;",
 			"uniform mat4 mView;",
 			"uniform float time;",
-			"uniform vec3 modelPosition[4087];",
+			"uniform vec3 modelPosition[ `36347` - 8];",
 			"void main()",
 			"{",
 			    "vec3 ambientColor = vec3(0.7, 0.7, 0.7);",

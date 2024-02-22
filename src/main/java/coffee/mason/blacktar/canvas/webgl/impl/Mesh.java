@@ -1,10 +1,14 @@
 package coffee.mason.blacktar.canvas.webgl.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.teavm.jso.core.JSNumber;
 
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.webgl.BufferInformation;
+import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.Obj;
 import coffee.mason.blacktar.canvas.webgl.Shader;
 import coffee.mason.blacktar.canvas.webgl.UniformInformation;
@@ -20,7 +24,10 @@ public class Mesh {
 
 	private ArrayList<MeshInstance> instances = new ArrayList<MeshInstance>();
 
+	private WebGLContext gl;
+
 	public Mesh(WebGLContext gl, Obj obj) {
+		this.gl = gl;
 		setObj(obj);
 		createBuffers(gl);
 	}
@@ -57,25 +64,48 @@ public class Mesh {
 
 	// Draws all mesh instances to shader
 	public void drawInstances(Shader shader) {
-		shader.drawObj(obj, buffers, generateUniforms("modelPosition"), instances.size());
+
+		// Keep in mind vertex uniforms
+		// This is a bit hardcoded...
+		// TODO: FIX HARDCODING
+		int vectors = (((JSNumber) (gl.getParameter(GL.MAX_VERTEX_UNIFORM_VECTORS))).intValue() - 8);
+
+		int drawCalls = (int) Math.ceil(instances.size() / ((double) vectors));
+
+		for (int i = 0; i < drawCalls; i++) {
+			int chunk = (i == drawCalls - 1) ? instances.size() % vectors : vectors;
+			shader.drawObj(obj, buffers, generateUniforms("modelPosition", chunk, chunk * i), chunk);
+		}
+
 	}
 
-	
-	//TODO: Cache f32 array
-	
-	private int gi;
-	private UniformInformation[] generateUniforms(String positionName) {
-		float[] pos = new float[instances.size() * 3];
-		gi = 0;
-		instances.iterator().forEachRemaining(e -> {
-			pos[gi*3 + 0] = e.getLocation().getValue(0);
-			pos[gi*3 + 1] = e.getLocation().getValue(1);
-			pos[gi*3 + 2] = e.getLocation().getValue(2);
-			gi++;
-		});
-		
+	// TODO: Cache f32 array
+
+	private int generateUniformsIteratorIndex;
+
+	private UniformInformation[] generateUniforms(String positionName, int size, int start) {
+		float[] pos = new float[size * 3];
+		generateUniformsIteratorIndex = 0;
+
+		Iterator<MeshInstance> itr = instances.iterator();
+
+		while (itr.hasNext()) {
+			if (generateUniformsIteratorIndex >= start) {
+				MeshInstance instance = itr.next();
+				int relativeIndex = generateUniformsIteratorIndex - start;
+				pos[relativeIndex * 3 + 0] = instance.getLocation().getValue(0);
+				pos[relativeIndex * 3 + 1] = instance.getLocation().getValue(1);
+				pos[relativeIndex * 3 + 2] = instance.getLocation().getValue(2);
+			}
+
+			generateUniformsIteratorIndex++;
+			if (generateUniformsIteratorIndex > (size + start)) {
+				break;
+			}
+		}
+
 		UniformInformation position = new UniformInformation(positionName, Float32ArrayUtil.of(pos));
-		return new UniformInformation[]{position};
+		return new UniformInformation[] { position };
 	}
 
 }
