@@ -72,9 +72,11 @@ public class Mesh {
 
 		int drawCalls = (int) Math.ceil(instances.size() / ((double) vectors));
 
+		int sum = 0;
 		for (int i = 0; i < drawCalls; i++) {
-			int chunk = (i == drawCalls - 1) ? instances.size() % vectors : vectors;
-			shader.drawObj(obj, buffers, generateUniforms("modelPosition", chunk, chunk * i), chunk);
+			int size = (i == drawCalls - 1) ? instances.size() % vectors : vectors;
+			shader.drawObj(obj, buffers, generateUniforms("modelPosition", size, sum), size);
+			sum += size;
 		}
 
 	}
