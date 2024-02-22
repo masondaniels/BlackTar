@@ -85,26 +85,15 @@ public class Mesh {
 
 	private UniformInformation[] generateUniforms(String positionName, int size, int start) {
 		float[] pos = new float[size * 3];
-		int generateUniformsIteratorIndex = 0;
 
-		Iterator<MeshInstance> itr = instances.iterator();
-
-		int relativeIndex = 0;
-		while (itr.hasNext()) {
-			if (generateUniformsIteratorIndex >= start) {
-				MeshInstance instance = itr.next();
-				pos[relativeIndex * 3 + 0] = instance.getLocation().getValue(0);
-				pos[relativeIndex * 3 + 1] = instance.getLocation().getValue(1);
-				pos[relativeIndex * 3 + 2] = instance.getLocation().getValue(2);
-				relativeIndex++;
-			}
-
-			generateUniformsIteratorIndex++;
-			if (generateUniformsIteratorIndex > (size + start)) {
-				break;
-			}
+		// Bad. But whatever.
+		for (int i = 0; i < size; i++) {
+			MeshInstance instance = instances.get(i+start);
+			pos[i * 3 + 0] = instance.getLocation().getValue(0);
+			pos[i * 3 + 1] = instance.getLocation().getValue(1);
+			pos[i * 3 + 2] = instance.getLocation().getValue(2);
 		}
-
+		
 		UniformInformation position = new UniformInformation(positionName, Float32ArrayUtil.of(pos));
 		return new UniformInformation[] { position };
 	}
