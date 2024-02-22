@@ -70,8 +70,17 @@ public class Vec3 extends VecN {
 		return Vec3.cross(this, other);
 	}
 
+	private JSObject cachedFloat;
+	
 	public JSObject toFloat32Array() {
-		return Float32ArrayUtil.of(getValue(0), getValue(1), getValue(2));
+		if (cachedFloat == null) {
+			this.cachedFloat = Float32ArrayUtil.of(getValue(0), getValue(1), getValue(2));
+		}
+		if (isValueChanged()) {
+			this.cachedFloat = Float32ArrayUtil.of(getValue(0), getValue(1), getValue(2));
+			setChangedFalse();
+		}
+		return cachedFloat;
 	}
 
 	public Vec3 inverse() {

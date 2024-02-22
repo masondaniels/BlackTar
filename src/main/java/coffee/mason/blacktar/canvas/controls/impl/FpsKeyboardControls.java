@@ -16,7 +16,7 @@ public class FpsKeyboardControls implements KeyboardControls, Updatable {
 
 	private Camera camera;
 
-	public FpsKeyboardControls(Camera camera, WebGLContext gl, int viewUniformLocation) {
+	public FpsKeyboardControls(WebGLContext gl, Camera camera, int viewUniformLocation) {
 		this.gl = gl;
 		this.viewUniformLocation = viewUniformLocation;
 		this.camera = camera;

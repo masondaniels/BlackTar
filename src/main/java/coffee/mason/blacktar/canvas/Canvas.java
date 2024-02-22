@@ -6,11 +6,12 @@ import org.teavm.jso.core.JSNumber;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 
+import coffee.mason.blacktar.component.Drawable;
 import coffee.mason.blacktar.component.Updatable;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.util.RandomUtil;
 
-public abstract class Canvas implements Updatable {
+public abstract class Canvas implements Updatable, Drawable {
 
 	protected HTMLCanvasElement canvas;
 	private String contextType;
@@ -66,8 +67,7 @@ public abstract class Canvas implements Updatable {
 			setHeight(Window.current().getInnerHeight());
 		}
 		onDPI();
-		onCanvasResize(); // Calls special methods (in implemented classes) on canvas resize if there are
-							// any
+		onCanvasResize();
 		draw();
 	}
 
@@ -78,8 +78,6 @@ public abstract class Canvas implements Updatable {
 	public abstract void loadBeforeAnimation();
 
 	public abstract void loadAfterAnimation();
-
-	public abstract void draw();
 
 	public abstract void onCanvasResize();
 	

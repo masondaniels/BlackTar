@@ -36,24 +36,21 @@ public class Testing {
 
 			@Override
 			public void update() {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void onCanvasResize() {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void loadBeforeAnimation() {
-				// TODO Auto-generated method stub
+
 			}
 
 			@Override
 			public void loadAfterAnimation() {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -63,7 +60,7 @@ public class Testing {
 				getCtx().setFont(10 * getDPI() + "px sans-serif");
 				getCtx().setFillStyle("white");
 
-				Camera camera = glImpl.getCamera();
+				Camera camera = glImpl.getScene().getCamera();
 
 				String x = JavaScriptUtil.numToFixed(camera.getPosX(), 2);
 				String y = JavaScriptUtil.numToFixed(camera.getPosY(), 2);

@@ -5,156 +5,102 @@ import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.controls.impl.MCPETouchControls;
-import coffee.mason.blacktar.canvas.webgl.BufferInformation;
 import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
-import coffee.mason.blacktar.canvas.webgl.Shader;
-import coffee.mason.blacktar.linear.Mat4x4;
+import coffee.mason.blacktar.canvas.webgl.impl.Mesh;
+import coffee.mason.blacktar.canvas.webgl.impl.MeshInstance;
+import coffee.mason.blacktar.canvas.webgl.impl.Scene;
+import coffee.mason.blacktar.linear.Vec3;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 
 public class CanvasGLImpl2 extends CanvasGL2 {
 
-	private static final String[] VERTEX = {
-			"# version 300 es",
-			"precision highp float;",
-			"layout (location=0) in vec3 triPosition;",
-			"layout (location=1) in vec3 triNormal;",
-			"out vec3 triColor;",
-			"uniform mat4 mProj;",
-			"uniform mat4 mView;",
-			"uniform float time;",
-			"void main()",
-			"{",
-			    "vec3 ambientColor = vec3(0.7, 0.7, 0.7);",
-			    "float ambientIntensity = max(dot(triNormal, vec3(0.0, 1.0, 0.0)), 0.0);", // Lambertian reflection model
-			    "vec3 ambient = ambientColor * ambientIntensity;",
-			    "vec3 rColor = vec3(min(tan(float(gl_InstanceID)), 0.2), min(cos(float(gl_InstanceID)), 0.3), min(sin(float(gl_InstanceID)), 0.2));",
-			    "triColor = vec3(0.1, 0.1, 0.1) + ambient + rColor;",
-			    "gl_Position = mProj * mView * vec4(triPosition.x + cos(float(gl_InstanceID)*time), triPosition.y, triPosition.z - float(gl_InstanceID)*5.0, 1.0);",
-			"}"
-	};
-	
-	private static final String[] FRAG = {
-			"# version 300 es",
-			"precision highp float;",
-			"in vec3 triColor;",
-			"out vec4 fragCoord;",
-			"void main()",
-			"{",
-				"fragCoord = vec4(triColor, 1.0);",
-			"}"
-	};
-	
+	private Scene scene;
+
 	public CanvasGLImpl2(boolean fullscreen) {
 		super(fullscreen);
-	}
 
-	private Mat4x4 proj;
-
-	private int projUniformLocation;
-	private int viewUniformLocation;
-	
-	private int timeUniformLocation;
-
-	private Camera camera;
-	private FpsKeyboardControls keyboardControls;
-	
-	private MCPETouchControls touchControls;
-	
-	@Override
-	public void loadBeforeAnimation() {
-		
-		setupShader();
-		
-		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/1000f);
-		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		
-		camera = new Camera();
-		
-		keyboardControls = new FpsKeyboardControls(camera, gl, viewUniformLocation);
-		camera.setPitch(-16f);
-		camera.setYaw(272.4f);
-		camera.setPosX(0.45f);
-		camera.setPosY(7.5f);
-		camera.setPosZ(12f);
-		camera.updateViewDirection();
-		
-		uniformMatrix4fv();
-		
-		touchControls = new MCPETouchControls(gl, camera, viewUniformLocation);
-
-	}
-
-	private Shader shader;
-	private BufferInformation tv; // teapot vertex buffer
-	private BufferInformation tn; // teapot normal buffer
-	private BufferInformation cv; // cube vertex buffer
-	private BufferInformation cn; // cube normal buffer
-	
-	private void setupShader() {
-
-		shader = new Shader(gl, VERTEX, FRAG);
-		shader.useProgram();
-		
-		tv = shader.createFloatBuffer(0, 3, ObjStatic.TEAPOT.getTriangleFloats());
-		tn = shader.createFloatBuffer(1, 3, ObjStatic.TEAPOT.getNormalFloats());
-		
-		cv = shader.createFloatBuffer(0, 3, ObjStatic.CUBE.getTriangleFloats());
-		cn = shader.createFloatBuffer(1, 3, ObjStatic.CUBE.getNormalFloats());
-
-		// Enable depth testing & culling
-		gl.frontFace(GL.CCW);
-		gl.cullFace(GL.BACK);
-		gl.enable(GL.DEPTH_TEST);
-
-		projUniformLocation = shader.getUniformLocation("mProj");
-		viewUniformLocation = shader.getUniformLocation("mView");
-		timeUniformLocation = shader.getUniformLocation("time");
-		
-	}
-
-	private void uniformMatrix4fv() {
-		gl.uniformMatrix4fv(projUniformLocation, false, proj.getArray());
-		gl.uniformMatrix4fv(viewUniformLocation, false, camera.getViewMatrix().getArray());
-	}
-
-	@Override
-	public void loadAfterAnimation() {
-
-	}
-	
-	private void onResize() {
-		gl.viewport(0, 0, (float) getWidth(), (float) getHeight());
-		proj = Mat4x4.perspective((float) Math.toRadians(45), (float) (getWidth() / getHeight()), 0.1f, 1000f);
-		uniformMatrix4fv();
-		System.out.println("Updated projection matrix:\n" + proj.toString());
 	}
 
 	@Override
 	public void update() {
-		gl.uniform1f(timeUniformLocation, JavaScriptUtil.getElapsed().floatValue()/10000f);
+		scene.update();
 		keyboardControls.update();
 		touchControls.update();
+
+		moveInstances();
+	}
+
+	private void moveInstances() {
+		MeshInstance instance = scene.getMesh("teapot").getInstances().get(0);
+		instance.setLocation(
+				(Vec3) (unitCircle(JavaScriptUtil.getElapsed().floatValue() / 100f).add(new Vec3(10f, 3f, 10f))));
+		
+		MeshInstance instance1 = scene.getMesh("cube").getInstances().get(1);
+		instance1.setLocation((Vec3) new Vec3(1.5f, 0, 0).add(new Vec3((float)Math.cos(JavaScriptUtil.getElapsed().floatValue()/200f)*3, 0, 0)));
+		
+		MeshInstance instance2 = scene.getMesh("cube").getInstances().get(2);
+		instance2.setLocation((Vec3) new Vec3(1.2f, 1.4f, 0.3f).add(new Vec3(0, 0, (float)Math.cos(JavaScriptUtil.getElapsed().floatValue()/400f)*5)));
+	}
+
+	private Vec3 unitCircle(float f) {
+		return new Vec3((float) Math.cos(f), (float) Math.sin(f), (float) Math.sin(f));
 	}
 
 	@Override
 	public void draw() {
 		gl.clearColor(0.7f, 0.7f, 0.7f, 1f);
 		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+		scene.draw();
+	}
 
-//		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 50);
+	private FpsKeyboardControls keyboardControls;
+	private MCPETouchControls touchControls;
 
-		shader.drawObj(ObjStatic.TEAPOT, tv, tn);
-		shader.drawObj(ObjStatic.CUBE, cv, cn);
+	@Override
+	public void loadBeforeAnimation() {
+
+		scene = new Scene(gl, (float) getWidth(), (float) getHeight());
+
+		Mesh cubeMesh = new Mesh(gl, ObjStatic.CUBE);
+		scene.putMesh("cube", cubeMesh);
+
+		scene.createInstance("cube", new MeshInstance(new Vec3(0, 0, 0)));
+
+		scene.createInstance("cube", new MeshInstance(new Vec3(1.5f, 0, 0)));
+
+		scene.createInstance("cube", new MeshInstance(new Vec3(1.2f, 1.4f, 0.3f)));
+
+		Mesh teapotMesh = new Mesh(gl, ObjStatic.TEAPOT);
+		scene.putMesh("teapot", teapotMesh);
+
+		scene.createInstance("teapot", new MeshInstance(new Vec3(3, 0, 0)));
+
+		scene.createInstance("teapot", new MeshInstance(new Vec3(6.5f, 0, 0)));
+
+		scene.createInstance("teapot", new MeshInstance(new Vec3(9.2f, -1.4f, 0.3f)));
+
+		scene.resize((float) getWidth(), (float) getHeight());
+
+		keyboardControls = new FpsKeyboardControls(gl, scene.getCamera(),
+				scene.getShader().getUniformLocation("mView"));
+		touchControls = new MCPETouchControls(gl, scene.getCamera(), scene.getShader().getUniformLocation("mView"));
+
+	}
+
+	@Override
+	public void loadAfterAnimation() {
+		scene.resize((float) getWidth(), (float) getHeight());
+
 	}
 
 	@Override
 	public void onCanvasResize() {
-		onResize();
+		scene.resize((float) getWidth(), (float) getHeight());
 	}
 
-	public Camera getCamera() {
-		return camera;
+	public Scene getScene() {
+		return scene;
 	}
 
 	public TouchControls getTouchControls() {

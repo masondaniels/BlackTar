@@ -49,12 +49,24 @@ public class MatWxH {
 	public float getValue(int index) {
 		return array.get(index);
 	}
+	
+	// Used for storing cached float 32 array
+	private boolean changedValue;
+	
+	public boolean isValueChanged() {
+		return changedValue;
+	}
+	
+	public void setChangedFalse() {
+		this.changedValue = false;
+	}
 
 	public void setValue(int x, int y, float v) {
 		setValue(y * w + x, v);
 	}
 
 	public void setValue(int index, float v) {
+		changedValue = true;
 		array.set(index, v);
 	}
 
