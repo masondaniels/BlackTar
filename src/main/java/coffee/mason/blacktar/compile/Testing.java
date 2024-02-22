@@ -1,11 +1,12 @@
 package coffee.mason.blacktar.compile;
 
-import javax.naming.OperationNotSupportedException;
+import org.teavm.jso.core.JSNumber;
 
 import coffee.mason.blacktar.canvas.Canvas2D;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
+import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.Obj;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
 import coffee.mason.blacktar.html.ErrorBox;
@@ -17,6 +18,8 @@ public class Testing {
 	public static void main(String[] args) {
 
 		new ErrorBox();
+		
+		
 
 		new FileLoader("teapot.obj", "cube.obj") {
 
@@ -87,6 +90,27 @@ public class Testing {
 		ui.setZIndex(2);
 
 		TouchControls.register(glImpl.getTouchControls(), ui);
+		
+		// Debug max uniforms
+		JSNumber maxVertexUniforms = (JSNumber) glImpl.gl().getParameter(GL.MAX_VERTEX_UNIFORM_VECTORS);
+		JSNumber maxFragmentUniforms = (JSNumber) glImpl.gl().getParameter(GL.MAX_FRAGMENT_UNIFORM_VECTORS);
+
+		
+		
+		try {
+			throw new Exception("Max Vertex Uniform Vectors: " + maxVertexUniforms.intValue());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			throw new Exception("Max Fragment Uniform Vectors: " + maxFragmentUniforms.intValue());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 }

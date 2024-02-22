@@ -31,13 +31,6 @@ public class Shader {
 
 		gl.compileShader(vertexShader);
 		gl.compileShader(fragShader);
-		
-		// Debug max uniforms
-		JSObject maxVertexUniforms = gl.getParameter(GL.MAX_VERTEX_UNIFORM_VECTORS);
-		JSObject maxFragmentUniforms = gl.getParameter(GL.MAX_FRAGMENT_UNIFORM_VECTORS);
-
-		System.err.println("Max Vertex Uniform Vectors: " + maxVertexUniforms);
-		System.err.println("Max Fragment Uniform Vectors: " + maxFragmentUniforms);
 
 		// Compiling error checks - fragment
 		JSObject compileStatusFrag = gl.getShaderParameter(fragShader, GL.COMPILE_STATUS);
@@ -84,12 +77,11 @@ public class Shader {
 		return program;
 	}
 
-
-	
 	public void useBuffer(BufferInformation buffer) {
 		gl.disableVertexAttribArray(buffer.getLocation());
 		gl.bindBuffer(GL.ARRAY_BUFFER, buffer.getBuffer());
-		gl.vertexAttribPointer(buffer.getLocation(), buffer.getElements(), GL.FLOAT, false, buffer.getElements() * 4, 0);
+		gl.vertexAttribPointer(buffer.getLocation(), buffer.getElements(), GL.FLOAT, false, buffer.getElements() * 4,
+				0);
 		gl.enableVertexAttribArray(buffer.getLocation());
 	}
 
@@ -98,20 +90,20 @@ public class Shader {
 	}
 
 	public void drawObj(Obj obj, BufferInformation[] buffers, UniformInformation[] uniforms, int instances) {
-		
+
 		gl.useProgram(program);
-		
+
 		for (int i = 0; i < buffers.length; i++) {
 			useBuffer(buffers[i]);
 		}
-		
+
 		for (int i = 0; i < uniforms.length; i++) {
 			useUniform(uniforms[i]);
 		}
-		
-		((WebGLContext2) gl).drawArraysInstanced(GL.TRIANGLES, 0, obj.getTriangleFloats().getLength()/3, instances);
+
+		((WebGLContext2) gl).drawArraysInstanced(GL.TRIANGLES, 0, obj.getTriangleFloats().getLength() / 3, instances);
 	}
-	
+
 	public void useUniform(UniformInformation uniform) {
 		// TODO: Implement more than v3/parse types
 		gl.uniform3fv(getUniformLocation(uniform.getUniformName()), uniform.getData());
