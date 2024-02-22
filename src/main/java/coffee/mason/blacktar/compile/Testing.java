@@ -1,17 +1,22 @@
 package coffee.mason.blacktar.compile;
 
+import javax.naming.OperationNotSupportedException;
+
 import coffee.mason.blacktar.canvas.Canvas2D;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
 import coffee.mason.blacktar.canvas.webgl.Obj;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
+import coffee.mason.blacktar.html.ErrorBox;
 import coffee.mason.blacktar.util.JavaScriptUtil;
 import coffee.mason.blacktar.web.files.FileLoader;
 
 public class Testing {
 
 	public static void main(String[] args) {
+
+		new ErrorBox();
 
 		new FileLoader("teapot.obj", "cube.obj") {
 
