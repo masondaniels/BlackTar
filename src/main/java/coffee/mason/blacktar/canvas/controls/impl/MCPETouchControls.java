@@ -20,10 +20,13 @@ public class MCPETouchControls implements TouchControls, Updatable {
 
 	private float speed = 0.3f;
 
-	private StyledButtonHeld wb;
-	private StyledButtonHeld ab;
-	private StyledButtonHeld sb;
+	private StyledButtonHeld wb; // w button
+	private StyledButtonHeld ab; // a button
+	private StyledButtonHeld sb; // ...
 	private StyledButtonHeld db;
+	
+	private StyledButtonHeld yub; // y up button
+	private StyledButtonHeld ydb; // ...
 
 	public MCPETouchControls(WebGLContext gl, Camera camera, int viewUniformLocation) {
 		this.camera = camera;
@@ -66,15 +69,31 @@ public class MCPETouchControls implements TouchControls, Updatable {
 				updateCamera();
 			}
 		};
+		
+		yub = new StyledButtonHeld("↑") {
 
-		StyledGrid grid = new StyledGrid(null, wb.getButton(), null, ab.getButton(), sb.getButton(), db.getButton());
+			@Override
+			protected void onHold() {
+				camera.moveUp(speed);
+				updateCamera();
+			}
+			
+		};
+		
+		ydb = new StyledButtonHeld("↓") {
+
+			@Override
+			protected void onHold() {
+				camera.moveDown(speed);
+				updateCamera();
+			}
+			
+		};
+		 
+
+		StyledGrid grid = new StyledGrid(null, wb.getButton(), null, ab.getButton(), sb.getButton(), db.getButton(), yub.getButton(), null, ydb.getButton());
 
 		grid.addToDocument();
-
-//		wb.setZIndex(3);
-//		ab.setZIndex(3);
-//		sb.setZIndex(3);
-//		db.setZIndex(3);
 
 	}
 
@@ -147,7 +166,8 @@ public class MCPETouchControls implements TouchControls, Updatable {
 		ab.update();
 		sb.update();
 		db.update();
-
+		ydb.update();
+		yub.update();
 	}
 
 }
