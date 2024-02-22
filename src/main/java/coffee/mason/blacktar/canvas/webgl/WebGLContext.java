@@ -68,4 +68,6 @@ public interface WebGLContext extends Any {
 	void frontFace(int mode);
 
 	void enable(int mode);
+
+	void disableVertexAttribArray(int location);
 }

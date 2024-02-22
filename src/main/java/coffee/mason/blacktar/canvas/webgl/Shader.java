@@ -45,7 +45,7 @@ public class Shader {
 			System.err.println("Compiling error with vertex shader.");
 			System.err.println(gl.getShaderInfoLog(vertexShader) + "");
 		}
-		
+
 		program = gl.createProgram();
 
 		gl.attachShader(program, vertexShader);
@@ -68,11 +68,11 @@ public class Shader {
 		}
 
 	}
-	
+
 	public void useProgram() {
 		gl.useProgram(program);
 	}
-	
+
 	public JSObject getProgram() {
 		return program;
 	}
@@ -81,39 +81,56 @@ public class Shader {
 	 * 
 	 * Create float attribute.
 	 * 
-	 * @param attribLocation
-	 * The location of the attribute in GPU memory/layout.
-	 * @param elements
-	 * The number of elements per attrib. Eg 3 if Vec3.
-	 * @param input
-	 * The float 32 array which will be written to the buffer.
+	 * @param attribLocation The location of the attribute in GPU memory/layout.
+	 * @param elements       The number of elements per attrib. Eg 3 if Vec3.
+	 * @param input          The float 32 array which will be written to the buffer.
 	 * @return
 	 */
-	public JSObject createFloatAttrib(int attribLocation, int elements, Float32Array input) {
+	public BufferInformation createFloatBuffer(int attribLocation, int elements, Float32Array input) {
 		JSObject buffer = createFloatVBO(input);
 		setupFloatAttrib(attribLocation, elements);
-		return buffer;
+		return new BufferInformation(buffer, attribLocation, elements);
 	}
-	
+
 	private void setupFloatAttrib(int attribLocation, int elements) {
 		gl.vertexAttribPointer(attribLocation, elements, GL.FLOAT, false, elements * 4, 0);
 		gl.enableVertexAttribArray(attribLocation);
 	}
-	
+
 	private JSObject createFloatVBO(Float32Array input) {
 		JSObject buffer = gl.createBuffer();
 		writeFloatVBO(buffer, input);
 		return buffer;
 	}
-	
-	
+
 	private void writeFloatVBO(JSObject buffer, Float32Array input) {
 		gl.bindBuffer(GL.ARRAY_BUFFER, buffer);
 		gl.bufferData(GL.ARRAY_BUFFER, input, GL.STATIC_DRAW);
 	}
+	
+	public void useBuffer(WebGLContext gl, BufferInformation buffer) {
+		gl.disableVertexAttribArray(buffer.getLocation());
+		gl.bindBuffer(GL.ARRAY_BUFFER, buffer.getBuffer());
+		gl.vertexAttribPointer(buffer.getLocation(), buffer.getElements(), GL.FLOAT, false, buffer.getElements() * 4, 0);
+		gl.enableVertexAttribArray(buffer.getLocation());
+	}
 
 	public int getUniformLocation(String string) {
 		return gl.getUniformLocation(getProgram(), string);
+	}
+
+	// TODO: Implement dynamic arrays instanced calls
+	public void drawObj(Obj obj, BufferInformation... buffers) {
+
+		gl.useProgram(program);
+		
+		// TODO: Implement usage of uniforms
+		
+		for (int i = 0; i < buffers.length; i++) {
+			useBuffer(gl, buffers[i]);
+		}
+
+		gl.drawArrays(GL.TRIANGLES, 0, obj.getTriangleFloats().getLength()/3);
 	}
 
 }

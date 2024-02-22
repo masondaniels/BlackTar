@@ -1,39 +1,35 @@
 package coffee.mason.blacktar.compile;
 
-import org.teavm.interop.AsyncCallback;
 import coffee.mason.blacktar.canvas.Canvas2D;
 import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.impl.CanvasGLImpl2;
 import coffee.mason.blacktar.canvas.webgl.Obj;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
-import coffee.mason.blacktar.util.AjaxUtil;
 import coffee.mason.blacktar.util.JavaScriptUtil;
+import coffee.mason.blacktar.web.files.FileLoader;
 
 public class Testing {
 
-
-
 	public static void main(String[] args) {
-		
-		AjaxUtil.get("teapot.obj", new AsyncCallback<String>() {
-			
+
+		new FileLoader("teapot.obj", "cube.obj") {
+
 			@Override
-			public void error(Throwable e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void complete(String result) {
-				ObjStatic.TEAPOT = new Obj(result.split("\n"));
+			public void onComplete(String[] content) {
+
+				ObjStatic.TEAPOT = new Obj(content[0].split("\n"));
 				ObjStatic.TEAPOT.computeNormals(Camera.up);
+
+				ObjStatic.CUBE = new Obj(content[1].split("\n"));
+				ObjStatic.CUBE.computeNormals(Camera.up);
+
 				init();
 			}
-		});
-		
+		};
+
 	}
-	
+
 	private static void init() {
 		CanvasGLImpl2 glImpl = new CanvasGLImpl2(true);
 		Canvas2D ui = new Canvas2D(true) {
@@ -63,7 +59,7 @@ public class Testing {
 
 			@Override
 			public void draw() {
-				getCtx().clearRect(0, 0, getWidth(), 100*getDPI());
+				getCtx().clearRect(0, 0, getWidth(), 100 * getDPI());
 				getCtx().setFont(10 * getDPI() + "px sans-serif");
 				getCtx().setFillStyle("white");
 

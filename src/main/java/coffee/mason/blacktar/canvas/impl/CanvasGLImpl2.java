@@ -5,6 +5,7 @@ import coffee.mason.blacktar.canvas.controls.TouchControls;
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
 import coffee.mason.blacktar.canvas.controls.impl.FpsKeyboardControls;
 import coffee.mason.blacktar.canvas.controls.impl.MCPETouchControls;
+import coffee.mason.blacktar.canvas.webgl.BufferInformation;
 import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.ObjStatic;
 import coffee.mason.blacktar.canvas.webgl.Shader;
@@ -85,14 +86,21 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 	}
 
 	private Shader shader;
+	private BufferInformation tv; // teapot vertex buffer
+	private BufferInformation tn; // teapot normal buffer
+	private BufferInformation cv; // cube vertex buffer
+	private BufferInformation cn; // cube normal buffer
 	
 	private void setupShader() {
 
 		shader = new Shader(gl, VERTEX, FRAG);
 		shader.useProgram();
 		
-		shader.createFloatAttrib(0, 3, ObjStatic.TEAPOT.getTriangleFloats());
-		shader.createFloatAttrib(1, 3, ObjStatic.TEAPOT.getNormalFloats());
+		tv = shader.createFloatBuffer(0, 3, ObjStatic.TEAPOT.getTriangleFloats());
+		tn = shader.createFloatBuffer(1, 3, ObjStatic.TEAPOT.getNormalFloats());
+		
+		cv = shader.createFloatBuffer(0, 3, ObjStatic.CUBE.getTriangleFloats());
+		cn = shader.createFloatBuffer(1, 3, ObjStatic.CUBE.getNormalFloats());
 
 		// Enable depth testing & culling
 		gl.frontFace(GL.CCW);
@@ -131,11 +139,13 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 
 	@Override
 	public void draw() {
-		gl.clearColor(0f, 0f, 0f, 1f);
+		gl.clearColor(0.7f, 0.7f, 0.7f, 1f);
 		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
-		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 50);
+//		gl.drawArraysInstanced(GL.TRIANGLES, 0, ObjStatic.TEAPOT.getTriangleFloats().getLength()/3, 50);
 
+		shader.drawObj(ObjStatic.TEAPOT, tv, tn);
+		shader.drawObj(ObjStatic.CUBE, cv, cn);
 	}
 
 	@Override
