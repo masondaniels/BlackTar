@@ -31,6 +31,13 @@ public class Shader {
 
 		gl.compileShader(vertexShader);
 		gl.compileShader(fragShader);
+		
+		// Debug max uniforms
+		JSObject maxVertexUniforms = gl.getParameter(GL.MAX_VERTEX_UNIFORM_VECTORS);
+		JSObject maxFragmentUniforms = gl.getParameter(GL.MAX_FRAGMENT_UNIFORM_VECTORS);
+
+		System.err.println("Max Vertex Uniform Vectors: " + maxVertexUniforms);
+		System.err.println("Max Fragment Uniform Vectors: " + maxFragmentUniforms);
 
 		// Compiling error checks - fragment
 		JSObject compileStatusFrag = gl.getShaderParameter(fragShader, GL.COMPILE_STATUS);
