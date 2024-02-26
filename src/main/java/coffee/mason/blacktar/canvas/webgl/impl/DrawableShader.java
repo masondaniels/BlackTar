@@ -40,9 +40,10 @@ public class DrawableShader extends Shader {
 	
 	public DrawableShader(WebGLContext gl) {
 		super(gl, VERTEX, FRAG);
-		gl.frontFace(GL.CCW);
+		gl.frontFace(GL.CW);
 		gl.cullFace(GL.BACK);
 		gl.enable(GL.DEPTH_TEST);
+		gl.enable(GL.CULL_FACE);
 	}
 	
 }

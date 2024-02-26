@@ -12,8 +12,9 @@ public class ErrorBox {
 
 	public ErrorBox() {
 		textArea = (HTMLTextAreaElement) HTMLDocument.current().createElement("textarea");
-		textArea.getStyle().setCssText("color: red; width: 20%; height: 20%; position: absolute; z-index: 99; top: 0; right: 0; user-select: none; background: rgba(0, 0, 0, 0); border: none; text-align: right;");
-
+		textArea.getStyle().setCssText("pointer-events: none; padding: 10px; color: red; width: 40%; height: 20%; position: absolute; z-index: 99; top: 0; right: 0; user-select: none; background: rgba(0, 0, 0, 0); border: none; text-align: right;");
+		textArea.setReadOnly(true);
+		
 		HTMLDocument.current().getBody().appendChild(textArea);
 		addConsoleListener("error", new ErrorHandler() {
 

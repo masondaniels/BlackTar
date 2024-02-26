@@ -30,6 +30,7 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		moveInstances();
 	}
 
+	// Moving causes lag because this is not using workers.
 	private void moveInstances() {
 		MeshInstance instance = scene.getMesh("teapot").getInstances().get(0);
 		instance.setLocation(
@@ -43,20 +44,20 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		instance2.setLocation((Vec3) new Vec3(1.2f, 1.4f, 0.3f)
 				.add(new Vec3(0, 0, (float) Math.cos(JavaScriptUtil.getElapsed().floatValue() / 400f) * 5)));
 
-		int i = 0;
-		for (int x = 0; x < 50; x++) {
-			for (int y = 0; y < 10; y++) {
-				for (int z = 0; z < 10; z++) {
-					scene.getMesh("cube").getInstances().get(i).setLocation(new Vec3(
-							(float) (x * 5 + Math.cos((float) x * JavaScriptUtil.getElapsed().floatValue() / 1000f)),
-							(float) (y * 5
-									+ Math.sin((float) x * JavaScriptUtil.getElapsed().floatValue() / (900f * i))),
-							(float) (z * 5
-									+ Math.sin((float) (z) * JavaScriptUtil.getElapsed().floatValue() / 1200f))));
-					i++;
-				}
-			}
-		}
+//		int i = 0;
+//		for (int x = 0; x < 10; x++) {
+//			for (int y = 0; y < 10; y++) {
+//				for (int z = 0; z < 10; z++) {
+//					scene.getMesh("cube").getInstances().get(i).setLocation(new Vec3(
+//							(float) (x * 5 + Math.cos((float) x * JavaScriptUtil.getElapsed().floatValue() / 1000f)),
+//							(float) (y * 5
+//									+ Math.sin((float) x * JavaScriptUtil.getElapsed().floatValue() / (900f * i))),
+//							(float) (z * 5
+//									+ Math.sin((float) (z) * JavaScriptUtil.getElapsed().floatValue() / 1200f))));
+//					i++;
+//				}
+//			}
+//		}
 
 	}
 
@@ -66,8 +67,6 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 
 	@Override
 	public void draw() {
-		gl.clearColor(0.7f, 0.7f, 0.7f, 1f);
-		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 		scene.draw();
 	}
 
@@ -90,10 +89,10 @@ public class CanvasGLImpl2 extends CanvasGL2 {
 		scene.createInstance("teapot", new MeshInstance(new Vec3(1.5f, 0, 0)));
 
 		scene.createInstance("teapot", new MeshInstance(new Vec3(1.2f, 1.4f, 0.3f)));
-		
-		for (int x = 0; x < 50; x++) {
-			for (int y = 0; y < 10; y++) {
-				for (int z = 0; z < 10; z++) {
+
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				for (int z = 0; z < 30; z++) {
 					scene.createInstance("cube",
 							new MeshInstance(new Vec3((float) (x * 5) + 20, (float) y * 5, (float) (z * 5) + 20)));
 				}

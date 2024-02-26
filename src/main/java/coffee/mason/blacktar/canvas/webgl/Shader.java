@@ -47,7 +47,7 @@ public class Shader {
 			int replacement = processMagicReplacement(matcher.group(2));
 			matcher.appendReplacement(sb, "$1" + replacement);
 		}
-		
+
 		matcher.appendTail(sb);
 
 		System.out.println(sb.toString());

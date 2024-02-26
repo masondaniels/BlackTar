@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import coffee.mason.blacktar.canvas.controls.impl.Camera;
+import coffee.mason.blacktar.canvas.webgl.GL;
 import coffee.mason.blacktar.canvas.webgl.Shader;
 import coffee.mason.blacktar.canvas.webgl.WebGLContext;
 import coffee.mason.blacktar.component.Drawable;
@@ -53,6 +54,9 @@ public class Scene implements Drawable, Updatable {
 
 	@Override
 	public void draw() {
+		gl.clearColor(0.7f, 0.7f, 0.7f, 1f);
+		gl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+		
 		Iterator<Entry<String, Mesh>> itr = meshes.entrySet().iterator();
 		while (itr.hasNext()) {
 			Entry<String, Mesh> entry = itr.next();
